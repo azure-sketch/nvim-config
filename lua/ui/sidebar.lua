@@ -3,6 +3,16 @@ local M = {}
 local views = require("ui.sidebar.views")
 
 local instance_name = "sidebar-search"
+local last_view = "files"
+
+local function validate_name(name)
+  if name ~= "files"
+      and name ~= "search"
+      and name ~= "git"
+  then
+    error("Unknown sidebar view: " .. tostring(name))
+  end
+end
 
 local function goto_editor()
   require("edgy").goto_main()
@@ -59,12 +69,8 @@ local function open_search()
 end
 
 function M.toggle(name)
-  if name ~= "files"
-      and name ~= "search"
-      and name ~= "git"
-  then
-    error("Unknown sidebar view: " .. tostring(name))
-  end
+  validate_name(name)
+  last_view = name
 
   local was_visible = views.find(name) ~= nil
   local editor = goto_editor()
@@ -88,6 +94,65 @@ function M.toggle(name)
   else
     vim.cmd("Git")
   end
+end
+
+-- イベント対象のバッファがサイドバーなら、その種類を記憶する。
+function M.remember_buffer(buf)
+  local name = views.name_of(buf)
+
+  if name then
+    last_view = name
+  end
+end
+
+-- 現在表示されているサイドバーの種類を記憶する。
+function M.remember_visible()
+  local _, name = views.find()
+
+  if name then
+    last_view = name
+  end
+end
+
+-- 表示中なら閉じ、非表示なら最後に使った種類を開く。
+-- 編集領域への復帰は呼び出し側が担当する。
+function M.toggle_last()
+  local _, name = views.find()
+  M.toggle(name or last_view)
+end
+
+-- 指定したサイドバーへフォーカスする。
+-- 表示中の場合は閉じず、非表示の場合だけ開く。
+function M.focus(name)
+  validate_name(name)
+
+  vim.cmd("stopinsert")
+  last_view = name
+
+  local win = views.find(name)
+
+  if win then
+    vim.api.nvim_set_current_win(win)
+  else
+    M.toggle(name)
+  end
+
+  -- 検索画面では、そのまま入力できる状態にする。
+  if name == "search" then
+    local buf = vim.api.nvim_get_current_buf()
+
+    if vim.bo[buf].filetype == "grug-far"
+        and vim.bo[buf].modifiable
+    then
+      vim.cmd("startinsert")
+    end
+  end
+end
+
+-- 表示中のサイドバー、なければ最後に使った種類へフォーカスする。
+function M.focus_last()
+  local _, name = views.find()
+  M.focus(name or last_view)
 end
 
 return M

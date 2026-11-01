@@ -2,11 +2,11 @@ local M = {}
 
 local keymap = require("ui.vscode.keymap")
 local bindings = require("ui.vscode.workspace_bindings")
-local views = require("ui.sidebar.views")
+local sidebar = require("ui.sidebar")
 
 function M.setup(resume_input, group)
   local actions = {}
-  local function sidebar(name)
+  local function toggle_view(name)
     return function()
       vim.cmd("stopinsert")
       require("ui.sidebar").toggle(name)
@@ -35,37 +35,19 @@ function M.setup(resume_input, group)
 
   bindings.apply("quick_open", actions.quick_open)
 
-  -- 現在表示されているサイドバーの種類を返す。
-  local function visible_sidebar()
-    local _, name = views.find()
-    return name
-  end
-
-  local last_sidebar = "files"
-
-  -- F6/F7/F8で開いた種類も記憶する。
+  -- キー操作以外で表示されたサイドバーも記憶する。
   vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter" }, {
     group = group,
     callback = function()
-      local name = visible_sidebar()
-      if name then
-        last_sidebar = name
-      end
+      sidebar.remember_visible()
     end,
   })
 
-  -- Ctrl+B: 表示中なら閉じる。
-  -- 閉じている場合は、最後の種類を開いて編集領域へ戻る。
+  -- 表示を切り替えた後、編集領域へ戻る。
   actions.toggle_sidebar = function()
     vim.cmd("stopinsert")
 
-    local current = visible_sidebar()
-
-    if current then
-      last_sidebar = current
-    end
-
-    require("ui.sidebar").toggle(current or last_sidebar)
+    sidebar.toggle_last()
 
     vim.schedule(function()
       require("edgy").goto_main()
@@ -79,15 +61,15 @@ function M.setup(resume_input, group)
     desc = "Command line",
   })
 
-  keymap.set(modes, "<F6>", sidebar("files"), {
+  keymap.set(modes, "<F6>", toggle_view("files"), {
     desc = "Files sidebar",
   })
 
-  keymap.set(modes, "<F7>", sidebar("search"), {
+  keymap.set(modes, "<F7>", toggle_view("search"), {
     desc = "Search sidebar",
   })
 
-  keymap.set(modes, "<F8>", sidebar("git"), {
+  keymap.set(modes, "<F8>", toggle_view("git"), {
     desc = "Git sidebar",
   })
 

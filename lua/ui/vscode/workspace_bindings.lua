@@ -15,11 +15,21 @@ local bindings = {
   },
 }
 
-function M.apply(name, callback, opts)
-  local binding = assert(
+local function binding_of(name)
+  return assert(
     bindings[name],
     "Unknown workspace binding: " .. tostring(name)
   )
+end
+
+-- プラグイン固有の設定テーブルへ登録するときに使う。
+function M.lhs(name)
+  return binding_of(name).lhs
+end
+
+-- Neovimのキーマップとして直接登録するときに使う。
+function M.apply(name, callback, opts)
+  local binding = binding_of(name)
 
   local options = vim.tbl_extend("force", {}, opts or {})
   local modes = options.modes or binding.modes

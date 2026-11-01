@@ -1,4 +1,5 @@
 local layout = require("ui.layout")
+local bindings = require("ui.vscode.workspace_bindings")
 
 return {
   {
@@ -9,10 +10,10 @@ return {
       opts.window.position = "left"
       opts.window.width = layout.sidebar.width
       opts.window.mappings = opts.window.mappings or {}
-      opts.window.mappings["<C-b>"] = function()
+      opts.window.mappings[bindings.lhs("toggle_sidebar")] = function()
         require("ui.vscode_editing").toggle_sidebar()
       end
-      opts.window.mappings["<C-p>"] = function()
+      opts.window.mappings[bindings.lhs("quick_open")] = function()
         require("ui.vscode_editing").quick_open()
       end
       opts.window.mappings["<space>"] = "none"

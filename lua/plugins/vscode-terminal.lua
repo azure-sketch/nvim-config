@@ -1,3 +1,5 @@
+local layout = require("ui.layout")
+
 local terminal
 local terminal_cwd
 
@@ -34,7 +36,7 @@ local function toggle_terminal()
       cwd = terminal_cwd,
       win = {
         position = "bottom",
-        height = 0.3,
+        height = layout.terminal.height,
       },
     })
   end
@@ -53,7 +55,7 @@ return {
 
       win = {
         position = "bottom",
-        height = 0.3,
+        height = layout.terminal.height,
 
         keys = {
           -- シェル内から、編集領域へフォーカスを戻す。

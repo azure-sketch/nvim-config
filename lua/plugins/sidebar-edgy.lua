@@ -1,3 +1,5 @@
+local layout = require("ui.layout")
+
 return {
   {
     "folke/edgy.nvim",
@@ -40,7 +42,7 @@ return {
 
       options = {
         left = {
-          size = 30,
+          size = layout.sidebar.width,
         },
       },
 
@@ -68,7 +70,7 @@ return {
       bottom = {
         {
           ft = "snacks_terminal",
-          size = { height = 0.3 },
+          size = { height = layout.terminal.height },
           title = "Terminal",
           filter = function(_, win)
             return vim.w[win].snacks_win

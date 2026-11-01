@@ -1,3 +1,5 @@
+local layout = require("ui.layout")
+
 return {
   {
     "nvim-neo-tree/neo-tree.nvim",
@@ -5,7 +7,7 @@ return {
     opts = function(_, opts)
       opts.window = opts.window or {}
       opts.window.position = "left"
-      opts.window.width = 30
+      opts.window.width = layout.sidebar.width
       opts.window.mappings = opts.window.mappings or {}
       opts.window.mappings["<C-b>"] = function()
         require("ui.vscode_editing").toggle_sidebar()

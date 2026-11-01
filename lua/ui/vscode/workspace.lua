@@ -74,13 +74,12 @@ function M.setup(resume_input, group)
   })
 
   -- サイドバーから編集領域に戻る。
-  keymap.set(modes, "<C-1>", function()
+  bindings.apply("focus_editor", function()
     vim.cmd("stopinsert")
     require("edgy").goto_main()
     resume_input()
-  end, {
-    desc = "Focus editor",
-  })
+  end)
+
   return actions
 end
 

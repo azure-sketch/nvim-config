@@ -13,6 +13,11 @@ local bindings = {
     modes = { "n", "i", "s", "x" },
     desc = "Toggle sidebar visibility",
   },
+  focus_editor = {
+    lhs = "<C-1>",
+    modes = { "n", "i", "s", "x" },
+    desc = "Focus editor",
+  },
 }
 
 local function binding_of(name)
@@ -25,6 +30,11 @@ end
 -- プラグイン固有の設定テーブルへ登録するときに使う。
 function M.lhs(name)
   return binding_of(name).lhs
+end
+
+-- プラグイン固有の設定テーブルで説明を共有するときに使う。
+function M.desc(name)
+  return binding_of(name).desc
 end
 
 -- Neovimのキーマップとして直接登録するときに使う。

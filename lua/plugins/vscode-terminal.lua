@@ -1,4 +1,5 @@
 local layout = require("ui.layout")
+local bindings = require("ui.vscode.workspace_bindings")
 
 local terminal
 local terminal_cwd
@@ -60,13 +61,13 @@ return {
         keys = {
           -- シェル内から、編集領域へフォーカスを戻す。
           editor = {
-            "<C-1>",
+            bindings.lhs("focus_editor"),
             function()
               require("edgy").goto_main()
               resume_editor()
             end,
             mode = { "n", "t" },
-            desc = "Focus editor",
+            desc = bindings.desc("focus_editor"),
           },
         },
       },

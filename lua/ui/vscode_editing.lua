@@ -28,7 +28,8 @@ local function configure_buffer(buf)
   if input.is_file_editor(buf) then
     require("ui.vscode.lines").attach(buf)
     require("ui.vscode.lsp").attach(buf, resume_input)
-    require("ui.vscode.navigation").attach(buf, resume_input)
+    require("ui.vscode.navigation").attach_file(buf, resume_input)
+    require("ui.vscode.buffers").attach_file(buf, resume_input)
     require("ui.vscode.comment").attach(buf)
     require("ui.vscode.diagnostics").attach(buf, resume_input)
     require("ui.vscode.format").attach(buf, resume_input)
@@ -50,7 +51,7 @@ local function configure_buffer(buf)
 
   require("ui.vscode.history").attach(buf)
   require("ui.vscode.selection").attach(buf)
-  require("ui.vscode.navigation").attach_common(buf)
+  require("ui.vscode.navigation").attach(buf)
   require("ui.vscode.find").attach(buf)
   require("ui.vscode.buffers").attach(buf)
 end

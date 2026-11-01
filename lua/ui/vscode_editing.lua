@@ -1,6 +1,5 @@
 local M = {}
 
-local keymap = require("ui.vscode.keymap")
 local bindings = require("ui.vscode.workspace_bindings")
 local input = require("ui.vscode.input")
 
@@ -24,8 +23,6 @@ local function configure_buffer(buf)
     return
   end
 
-  local map = keymap.for_buffer(buf)
-
   -- 通常の編集ファイルだけを対象にする。
   -- grug-farなどの専用画面には適用しない。
   if input.is_file_editor(buf) then
@@ -48,14 +45,7 @@ local function configure_buffer(buf)
     silent = true,
   })
 
-  -- Undo / Redo。
-  map("i", "<C-z>", "<C-o>u", "Undo")
-  map("i", "<C-y>", "<C-o><C-r>", "Redo")
-  map("n", "<C-z>", "u", "Undo")
-  map("n", "<C-y>", "<C-r>", "Redo")
-  map({ "s", "x" }, "<C-z>", "<Esc>u", "Undo")
-  map({ "s", "x" }, "<C-y>", "<Esc><C-r>", "Redo")
-
+  require("ui.vscode.history").attach(buf)
   require("ui.vscode.selection").attach(buf)
   require("ui.vscode.commands").attach(buf)
 end
@@ -86,17 +76,13 @@ local function schedule_editor_configuration(buf)
     if vim.api.nvim_buf_is_valid(buf) then
       configure_buffer(buf)
     end
+
     resume_input()
   end)
 end
 
 function M.setup()
-  -- Shift+移動で選択開始。
-  -- 選択後の文字入力は、選択範囲の置き換えになる。
-  vim.opt.keymodel = { "startsel", "stopsel" }
-  vim.opt.selectmode = { "mouse", "key" }
-  vim.opt.selection = "exclusive"
-  vim.opt.mouse = "a"
+  require("ui.vscode.options").setup()
 
   local group = vim.api.nvim_create_augroup(
     "VSCodeEditing",
@@ -104,7 +90,7 @@ function M.setup()
   )
 
   -- 入力開始時のプラグイン初期化が終わった後にも、
-  -- Ctrl+Pをファイル検索へ割り当て直す。
+  -- ファイル検索キーを割り当て直す。
   vim.api.nvim_create_autocmd("InsertEnter", {
     group = group,
     callback = function(event)
@@ -113,7 +99,12 @@ function M.setup()
   })
 
   -- 新しく表示された編集バッファへ設定する。
-  vim.api.nvim_create_autocmd({ "BufEnter", "WinEnter", "FileType", "LspAttach" }, {
+  vim.api.nvim_create_autocmd({
+    "BufEnter",
+    "WinEnter",
+    "FileType",
+    "LspAttach",
+  }, {
     group = group,
     callback = function(event)
       schedule_editor_configuration(event.buf)
@@ -128,7 +119,11 @@ function M.setup()
     callback = resume_input,
   })
 
-  local actions = require("ui.vscode.workspace").setup(resume_input, group)
+  local actions = require("ui.vscode.workspace").setup(
+    resume_input,
+    group
+  )
+
   M.quick_open = actions.quick_open
   M.toggle_sidebar = actions.toggle_sidebar
 

@@ -132,6 +132,56 @@ local function check()
   detect()
 end
 
+-- 現在の作業ウィンドウを残して、手動で差分表示を終了する。
+-- 自動片付けのfinish()とは対象の決め方が異なる。
+function M.close()
+  local current = vim.api.nvim_get_current_win()
+
+  if not vim.wo[current].diff then
+    vim.notify("差分表示中の作業ファイルで実行してください")
+    return
+  end
+
+  local buf = vim.api.nvim_win_get_buf(current)
+  local name = vim.api.nvim_buf_get_name(buf)
+
+  if vim.bo[buf].buftype ~= ""
+      or name:match("^fugitive://")
+  then
+    vim.notify("右側の作業ファイルへ移動して実行してください")
+    return
+  end
+
+  local targets = {}
+
+  -- 閉じ始める前に、すべての対象を確認する。
+  -- 比較側に未保存変更があれば、何も閉じずに中止する。
+  for _, win in ipairs(
+    vim.api.nvim_tabpage_list_wins(0)
+  ) do
+    if win ~= current and vim.wo[win].diff then
+      local other = vim.api.nvim_win_get_buf(win)
+
+      if vim.bo[other].modified then
+        vim.notify(
+          "比較側に未保存の変更があります。保存・確認してから閉じてください",
+          vim.log.levels.WARN
+        )
+        return
+      end
+
+      table.insert(targets, win)
+    end
+  end
+
+  for _, win in ipairs(targets) do
+    vim.api.nvim_win_close(win, false)
+  end
+
+  vim.api.nvim_set_current_win(current)
+  vim.cmd("diffoff")
+end
+
 function M.setup()
   local group = vim.api.nvim_create_augroup(
     "SidebarGitDiffSession",

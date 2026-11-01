@@ -1,35 +1,8 @@
 local M = {}
 
+local views = require("ui.sidebar.views")
+
 local instance_name = "sidebar-search"
-
-local function is_view(buf, name)
-  local ft = vim.bo[buf].filetype
-
-  if name == "files" then
-    return ft == "neo-tree"
-      and vim.b[buf].neo_tree_source == "filesystem"
-  end
-
-  if name == "search" then
-    return ft == "grug-far"
-  end
-
-  if name == "git" then
-    return ft == "fugitive"
-  end
-
-  return false
-end
-
-local function find_view(name)
-  for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
-    local buf = vim.api.nvim_win_get_buf(win)
-
-    if is_view(buf, name) then
-      return win
-    end
-  end
-end
 
 local function goto_editor()
   require("edgy").goto_main()
@@ -37,7 +10,7 @@ local function goto_editor()
   local current = vim.api.nvim_get_current_win()
   local buf = vim.api.nvim_win_get_buf(current)
 
-  if not is_view(buf, "files") and not is_view(buf, "search") and not is_view(buf, "git") then
+  if not views.is_view(buf, "files") and not views.is_view(buf, "search") and not views.is_view(buf, "git") then
     return current
   end
 
@@ -45,10 +18,10 @@ local function goto_editor()
     local b = vim.api.nvim_win_get_buf(win)
 
     if vim.api.nvim_win_get_config(win).relative == ""
-      and vim.bo[b].buftype == ""
-      and not is_view(b, "files")
-      and not is_view(b, "search")
-      and not is_view(buf, "git")
+        and vim.bo[b].buftype == ""
+        and not views.is_view(b, "files")
+        and not views.is_view(b, "search")
+        and not views.is_view(buf, "git")
     then
       vim.api.nvim_set_current_win(win)
       return win
@@ -59,12 +32,12 @@ local function goto_editor()
 end
 
 local function close_views()
-  if find_view("files") then
+  if views.find("files") then
     vim.cmd("Neotree action=close source=filesystem")
   end
 
   for _, name in ipairs({ "search", "git" }) do
-    local win = find_view(name)
+    local win = views.find(name)
 
     if win and vim.api.nvim_win_is_valid(win) then
       vim.api.nvim_win_close(win, false)
@@ -87,13 +60,13 @@ end
 
 function M.toggle(name)
   if name ~= "files"
-    and name ~= "search"
-    and name ~= "git"
+      and name ~= "search"
+      and name ~= "git"
   then
     error("Unknown sidebar view: " .. tostring(name))
   end
 
-  local was_visible = find_view(name) ~= nil
+  local was_visible = views.find(name) ~= nil
   local editor = goto_editor()
 
   close_views()

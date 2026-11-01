@@ -1,35 +1,8 @@
 local M = {}
 
-local views = {
-  ["neo-tree"] = "files",
-  ["grug-far"] = "search",
-  ["fugitive"] = "git",
-}
+local views = require("ui.sidebar.views")
 
 local last_view = "files"
-
-local function view_of(buf)
-  local ft = vim.bo[buf].filetype
-
-  if ft == "neo-tree"
-      and vim.b[buf].neo_tree_source ~= "filesystem"
-  then
-    return nil
-  end
-
-  return views[ft]
-end
-
-local function find_view(name)
-  for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
-    local buf = vim.api.nvim_win_get_buf(win)
-    local view = view_of(buf)
-
-    if view and (not name or view == name) then
-      return win, view
-    end
-  end
-end
 
 local function eligible(buf)
   if not vim.api.nvim_buf_is_valid(buf)
@@ -38,7 +11,7 @@ local function eligible(buf)
     return false
   end
 
-  if view_of(buf) then
+  if views.name_of(buf) then
     return true
   end
 
@@ -52,7 +25,7 @@ local function focus_view(name)
   last_view = name
 
   -- 既に表示されていれば、閉じずにフォーカスする。
-  local win = find_view(name)
+  local win = views.find(name)
 
   if win then
     vim.api.nvim_set_current_win(win)
@@ -74,7 +47,7 @@ local function focus_view(name)
 end
 
 local function focus_sidebar()
-  local win, name = find_view()
+  local win, name = views.find()
 
   if win then
     focus_view(name)
@@ -127,7 +100,7 @@ function M.setup()
     callback = function(event)
       local buf = event.buf
 
-      local name = view_of(buf)
+      local name = views.name_of(buf)
       if name then
         last_view = name
       end

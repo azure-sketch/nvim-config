@@ -2,6 +2,7 @@ local M = {}
 
 local keymap = require("ui.vscode.keymap")
 local bindings = require("ui.vscode.workspace_bindings")
+local views = require("ui.sidebar.views")
 
 function M.setup(resume_input, group)
   local actions = {}
@@ -34,22 +35,10 @@ function M.setup(resume_input, group)
 
   bindings.apply("quick_open", actions.quick_open)
 
-  -- 現在表示されているサイドバーの種類を調べる。
+  -- 現在表示されているサイドバーの種類を返す。
   local function visible_sidebar()
-    for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
-      local buf = vim.api.nvim_win_get_buf(win)
-      local ft = vim.bo[buf].filetype
-
-      if ft == "neo-tree"
-          and vim.b[buf].neo_tree_source == "filesystem"
-      then
-        return "files"
-      elseif ft == "grug-far" then
-        return "search"
-      elseif ft == "fugitive" then
-        return "git"
-      end
-    end
+    local _, name = views.find()
+    return name
   end
 
   local last_sidebar = "files"

@@ -32,7 +32,7 @@ local function configure_buffer(buf)
     require("ui.vscode.comment").attach(buf)
     require("ui.vscode.diagnostics").attach(buf, resume_input)
     require("ui.vscode.format").attach(buf, resume_input)
-    require("ui.vscode.commands").attach_file(buf, resume_input)
+    require("ui.vscode.find").attach_file(buf, resume_input)
     require("ui.vscode.selection").attach_file(buf)
   end
 
@@ -50,7 +50,9 @@ local function configure_buffer(buf)
 
   require("ui.vscode.history").attach(buf)
   require("ui.vscode.selection").attach(buf)
-  require("ui.vscode.commands").attach(buf)
+  require("ui.vscode.navigation").attach_common(buf)
+  require("ui.vscode.find").attach(buf)
+  require("ui.vscode.buffers").attach(buf)
 end
 
 -- 入力開始後に、プラグイン初期化で上書きされ得るキーを再設定する。

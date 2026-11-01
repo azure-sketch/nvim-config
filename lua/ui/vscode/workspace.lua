@@ -1,6 +1,7 @@
 local M = {}
 
 local keymap = require("ui.vscode.keymap")
+local bindings = require("ui.vscode.workspace_bindings")
 
 function M.setup(resume_input, group)
   local actions = {}
@@ -31,9 +32,7 @@ function M.setup(resume_input, group)
     resume_input()
   end
 
-  keymap.set(modes, "<C-p>", actions.quick_open, {
-    desc = "Quick open file",
-  })
+  bindings.apply("quick_open", actions.quick_open)
 
   -- 現在表示されているサイドバーの種類を調べる。
   local function visible_sidebar()
@@ -85,9 +84,7 @@ function M.setup(resume_input, group)
     end)
   end
 
-  keymap.set(modes, "<C-b>", actions.toggle_sidebar, {
-    desc = "Toggle sidebar visibility",
-  })
+  bindings.apply("toggle_sidebar", actions.toggle_sidebar)
 
   keymap.set(modes, "<C-S-p>", "<Esc>:", {
     desc = "Command line",

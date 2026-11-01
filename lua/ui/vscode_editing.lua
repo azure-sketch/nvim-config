@@ -1,10 +1,23 @@
 local M = {}
 
 local keymap = require("ui.vscode.keymap")
-
+local bindings = require("ui.vscode.workspace_bindings")
 local input = require("ui.vscode.input")
+
 local is_editable = input.is_editable
 local resume_input = input.resume
+
+local function quick_open()
+  if M.quick_open then
+    M.quick_open()
+  end
+end
+
+local function toggle_sidebar()
+  if M.toggle_sidebar then
+    M.toggle_sidebar()
+  end
+end
 
 local function configure_buffer(buf)
   if not is_editable(buf) then
@@ -25,16 +38,15 @@ local function configure_buffer(buf)
 
   require("ui.vscode.save").attach(buf, resume_input)
 
-  map({ "n", "i", "s", "x" }, "<C-p>", function()
-    if M.quick_open then
-      M.quick_open()
-    end
-  end, "Quick open file")
-  map({ "n", "i", "s", "x" }, "<C-b>", function()
-    if M.toggle_sidebar then
-      M.toggle_sidebar()
-    end
-  end, "Toggle sidebar visibility")
+  bindings.apply("quick_open", quick_open, {
+    buffer = buf,
+    silent = true,
+  })
+
+  bindings.apply("toggle_sidebar", toggle_sidebar, {
+    buffer = buf,
+    silent = true,
+  })
 
   -- Undo / Redo。
   map("i", "<C-z>", "<C-o>u", "Undo")
@@ -59,14 +71,10 @@ local function schedule_quick_open_refresh(buf)
       return
     end
 
-    keymap.set("i", "<C-p>", function()
-      if M.quick_open then
-        M.quick_open()
-      end
-    end, {
+    bindings.apply("quick_open", quick_open, {
+      modes = "i",
       buffer = buf,
       silent = true,
-      desc = "Quick open file",
     })
   end)
 end

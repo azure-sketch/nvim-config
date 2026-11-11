@@ -31,7 +31,7 @@ local function goto_editor()
         and vim.bo[b].buftype == ""
         and not views.is_view(b, "files")
         and not views.is_view(b, "search")
-        and not views.is_view(buf, "git")
+        and not views.is_view(b, "git")
     then
       vim.api.nvim_set_current_win(win)
       return win

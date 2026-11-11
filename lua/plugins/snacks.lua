@@ -51,6 +51,34 @@ return {
   "folke/snacks.nvim",
 
   opts = {
+    styles = {
+      input = {
+        keys = {
+          i_esc = { "<Esc>", "cancel", mode = "i", expr = false },
+          n_esc = { "<Esc>", "cancel", mode = "n", expr = false },
+        },
+      },
+    },
+
+    picker = {
+      win = {
+        input = {
+          keys = {
+            ["<Esc>"] = { "close", mode = { "n", "i" } },
+            ["<Down>"] = { "list_down", mode = { "n", "i" } },
+            ["<Up>"] = { "list_up", mode = { "n", "i" } },
+            ["<CR>"] = { "confirm", mode = { "n", "i" } },
+          },
+        },
+
+        list = {
+          keys = {
+            ["<Esc>"] = { "close", mode = { "n", "i" } },
+          },
+        },
+      },
+    },
+
     terminal = {
       enabled = true,
 
@@ -59,7 +87,6 @@ return {
         height = layout.terminal.height,
 
         keys = {
-          -- シェル内から、編集領域へフォーカスを戻す。
           editor = {
             bindings.lhs("focus_editor"),
             function()

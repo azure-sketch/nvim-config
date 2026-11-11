@@ -9,7 +9,7 @@ function M.setup(resume_input, group)
   local function toggle_view(name)
     return function()
       vim.cmd("stopinsert")
-      require("ui.sidebar").toggle(name)
+      sidebar.toggle(name)
     end
   end
 
@@ -27,7 +27,7 @@ function M.setup(resume_input, group)
     end
 
     vim.notify(
-      "Snacks Picker / Telescope が見つかりません",
+      "Snacks Picker が見つかりません",
       vim.log.levels.WARN
     )
     resume_input()

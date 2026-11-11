@@ -59,7 +59,7 @@ end
 
 function M.setup()
   local group = vim.api.nvim_create_augroup(
-    "VSCodeSidebarKeys",
+    "SidebarKeys",
     { clear = true }
   )
 

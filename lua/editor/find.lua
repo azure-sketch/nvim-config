@@ -1,6 +1,6 @@
 local M = {}
 
-local keymap = require("ui.vscode.keymap")
+local keymap = require("editor.keymap")
 
 local function move_match(command)
   local ok, err = pcall(vim.cmd, command)
@@ -15,7 +15,7 @@ function M.attach_file(buf, resume_input)
   local map = keymap.for_buffer(buf)
 
   map({ "n", "i" }, "<C-h>", function()
-    require("ui.vscode_replace").open(resume_input)
+    require("editor.replace").open(resume_input)
   end, "Replace in current file")
 end
 

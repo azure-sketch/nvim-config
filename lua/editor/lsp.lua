@@ -1,6 +1,6 @@
 local M = {}
 
-local keymap = require("ui.vscode.keymap")
+local keymap = require("editor.keymap")
 
 local function keycode(keys)
   return vim.api.nvim_replace_termcodes(

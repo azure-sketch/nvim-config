@@ -1,7 +1,7 @@
 local M = {}
 
 local bindings = require("bindings")
-local input = require("ui.vscode.input")
+local input = require("editor.input")
 
 local is_editable = input.is_editable
 local resume_input = input.resume
@@ -26,18 +26,18 @@ local function configure_buffer(buf)
   -- 通常の編集ファイルだけを対象にする。
   -- grug-farなどの専用画面には適用しない。
   if input.is_file_editor(buf) then
-    require("ui.vscode.lines").attach(buf)
-    require("ui.vscode.lsp").attach(buf, resume_input)
-    require("ui.vscode.navigation").attach_file(buf, resume_input)
-    require("ui.vscode.buffers").attach_file(buf, resume_input)
-    require("ui.vscode.comment").attach(buf)
-    require("ui.vscode.diagnostics").attach(buf, resume_input)
-    require("ui.vscode.format").attach(buf, resume_input)
-    require("ui.vscode.find").attach_file(buf, resume_input)
-    require("ui.vscode.selection").attach_file(buf)
+    require("editor.lines").attach(buf)
+    require("editor.lsp").attach(buf, resume_input)
+    require("editor.navigation").attach_file(buf, resume_input)
+    require("editor.buffers").attach_file(buf, resume_input)
+    require("editor.comment").attach(buf)
+    require("editor.diagnostics").attach(buf, resume_input)
+    require("editor.format").attach(buf, resume_input)
+    require("editor.find").attach_file(buf, resume_input)
+    require("editor.selection").attach_file(buf)
   end
 
-  require("ui.vscode.save").attach(buf, resume_input)
+  require("editor.save").attach(buf, resume_input)
 
   bindings.apply("quick_open", quick_open, {
     buffer = buf,
@@ -49,11 +49,11 @@ local function configure_buffer(buf)
     silent = true,
   })
 
-  require("ui.vscode.history").attach(buf)
-  require("ui.vscode.selection").attach(buf)
-  require("ui.vscode.navigation").attach(buf)
-  require("ui.vscode.find").attach(buf)
-  require("ui.vscode.buffers").attach(buf)
+  require("editor.history").attach(buf)
+  require("editor.selection").attach(buf)
+  require("editor.navigation").attach(buf)
+  require("editor.find").attach(buf)
+  require("editor.buffers").attach(buf)
 end
 
 -- 入力開始後に、プラグイン初期化で上書きされ得るキーを再設定する。
@@ -88,7 +88,7 @@ local function schedule_editor_configuration(buf)
 end
 
 function M.setup()
-  require("ui.vscode.options").setup()
+  require("editor.options").setup()
 
   local group = vim.api.nvim_create_augroup(
     "VSCodeEditing",
@@ -125,7 +125,7 @@ function M.setup()
     callback = resume_input,
   })
 
-  local actions = require("ui.vscode.workspace").setup(
+  local actions = require("editor.quick_open").setup(
     resume_input,
     group
   )

@@ -1,6 +1,6 @@
 local M = {}
 
-local keymap = require("ui.vscode.keymap")
+local keymap = require("editor.keymap")
 
 local function format_document(resume_input)
   vim.cmd("stopinsert")

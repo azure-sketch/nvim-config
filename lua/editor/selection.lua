@@ -1,6 +1,6 @@
 local M = {}
 
-local keymap = require("ui.vscode.keymap")
+local keymap = require("editor.keymap")
 
 -- Selectモードの行選択なら下へ拡張し、
 -- それ以外なら行選択へ変更する。

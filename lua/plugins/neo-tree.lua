@@ -11,10 +11,10 @@ return {
       opts.window.width = layout.sidebar.width
       opts.window.mappings = opts.window.mappings or {}
       opts.window.mappings[bindings.lhs("toggle_sidebar")] = function()
-        require("ui.vscode_editing").toggle_sidebar()
+        require("editor").toggle_sidebar()
       end
       opts.window.mappings[bindings.lhs("quick_open")] = function()
-        require("ui.vscode_editing").quick_open()
+        require("editor").quick_open()
       end
       opts.window.mappings["<space>"] = "none"
 

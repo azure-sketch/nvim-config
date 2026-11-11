@@ -1,6 +1,6 @@
 local M = {}
 
-local keymap = require("editor.keymap")
+local keymap = require("keymap")
 
 local function move_match(command)
   local ok, err = pcall(vim.cmd, command)

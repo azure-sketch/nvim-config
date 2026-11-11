@@ -1,6 +1,6 @@
 local M = {}
 
-local keymap = require("editor.keymap")
+local keymap = require("keymap")
 
 -- ジャンプ履歴を移動し、編集可能なら入力へ戻る。
 local function navigate_jump(key, resume_input)

@@ -1,6 +1,6 @@
 local M = {}
 
-local keymap = require("editor.keymap")
+local keymap = require("keymap")
 local bindings = require("bindings")
 
 function M.setup(resume_input)

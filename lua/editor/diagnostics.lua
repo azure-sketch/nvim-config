@@ -1,6 +1,6 @@
 local M = {}
 
-local keymap = require("editor.keymap")
+local keymap = require("keymap")
 
 local function show_problems(resume_input)
   vim.cmd("stopinsert")

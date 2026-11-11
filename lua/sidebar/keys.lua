@@ -1,7 +1,7 @@
 local M = {}
 
-local sidebar = require("ui.sidebar")
-local views = require("ui.sidebar.views")
+local sidebar = require("sidebar")
+local views = require("sidebar.views")
 
 local function eligible(buf)
   if not vim.api.nvim_buf_is_valid(buf)

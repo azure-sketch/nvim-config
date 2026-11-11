@@ -7,14 +7,14 @@ return {
       {
         "<leader>zm",
         function()
-          require("ui.git_merge").open()
+          require("sidebar.git_merge").open()
         end,
         desc = "Sidebar: Open merge editor",
       },
       {
         "<leader>zd",
         function()
-          require("ui.git_diff").close()
+          require("sidebar.git_diff").close()
         end,
         desc = "Sidebar: Close diff, keep working file",
       },
@@ -43,7 +43,7 @@ return {
         end,
       })
 
-      require("ui.git_diff").setup()
+      require("sidebar.git_diff").setup()
     end,
   },
 }

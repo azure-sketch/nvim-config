@@ -1,6 +1,6 @@
 local M = {}
 
-local views = require("ui.sidebar.views")
+local views = require("sidebar.views")
 
 local instance_name = "sidebar-search"
 local last_view = "files"

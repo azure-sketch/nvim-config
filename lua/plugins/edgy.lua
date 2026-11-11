@@ -15,21 +15,21 @@ return {
       {
         "<leader>zf",
         function()
-          require("ui.sidebar").toggle("files")
+          require("sidebar").toggle("files")
         end,
         desc = "Sidebar: Files",
       },
       {
         "<leader>zs",
         function()
-          require("ui.sidebar").toggle("search")
+          require("sidebar").toggle("search")
         end,
         desc = "Sidebar: Search",
       },
       {
         "<leader>zg",
         function()
-          require("ui.sidebar").toggle("git")
+          require("sidebar").toggle("git")
         end,
         desc = "Sidebar: Git",
       },

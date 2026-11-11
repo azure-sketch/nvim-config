@@ -7,7 +7,7 @@ return {
       once = true,
       callback = function()
         require("ui.vscode_editing").setup()
-        require("ui.vscode_sidebar_keys").setup()
+        require("sidebar.keys").setup()
       end,
     })
   end,

@@ -1,6 +1,6 @@
 local M = {}
 
-local bindings = require("ui.vscode.workspace_bindings")
+local bindings = require("bindings")
 local input = require("ui.vscode.input")
 
 local is_editable = input.is_editable

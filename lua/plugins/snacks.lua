@@ -1,5 +1,5 @@
-local layout = require("ui.layout")
-local bindings = require("ui.vscode.workspace_bindings")
+local layout = require("layout")
+local bindings = require("bindings")
 local term = require("terminal")
 
 return {

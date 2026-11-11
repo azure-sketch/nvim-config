@@ -1,4 +1,4 @@
-local layout = require("ui.layout")
+local layout = require("layout")
 
 return {
   {

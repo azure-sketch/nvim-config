@@ -1,7 +1,7 @@
 local M = {}
 
 local keymap = require("ui.vscode.keymap")
-local bindings = require("ui.vscode.workspace_bindings")
+local bindings = require("bindings")
 local sidebar = require("ui.sidebar")
 
 function M.setup(resume_input, group)

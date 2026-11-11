@@ -125,13 +125,11 @@ function M.setup()
     callback = resume_input,
   })
 
-  local actions = require("editor.quick_open").setup(
-    resume_input,
-    group
-  )
+  local editor_actions = require("editor.quick_open").setup(resume_input)
+  local sidebar_actions = require("sidebar.actions").setup(resume_input)
 
-  M.quick_open = actions.quick_open
-  M.toggle_sidebar = actions.toggle_sidebar
+  M.quick_open = editor_actions.quick_open
+  M.toggle_sidebar = sidebar_actions.toggle_sidebar
 
   for _, buf in ipairs(vim.api.nvim_list_bufs()) do
     if vim.api.nvim_buf_is_loaded(buf) then

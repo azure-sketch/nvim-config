@@ -11,30 +11,6 @@ return {
       vim.opt.splitkeep = "screen"
     end,
 
-    keys = {
-      {
-        "<leader>zf",
-        function()
-          require("sidebar").toggle("files")
-        end,
-        desc = "Sidebar: Files",
-      },
-      {
-        "<leader>zs",
-        function()
-          require("sidebar").toggle("search")
-        end,
-        desc = "Sidebar: Search",
-      },
-      {
-        "<leader>zg",
-        function()
-          require("sidebar").toggle("git")
-        end,
-        desc = "Sidebar: Git",
-      },
-    },
-
     opts = {
       animate = {
         enabled = false,

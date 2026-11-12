@@ -2,7 +2,6 @@ local M = {}
 
 local views = require("sidebar.views")
 
-local instance_name = "sidebar-search"
 local last_view = "files"
 
 local function validate_name(name)
@@ -57,6 +56,7 @@ end
 
 local function open_search()
   local grug = require("grug-far")
+  local instance_name = "sidebar-search"
 
   if grug.has_instance(instance_name) then
     grug.get_instance(instance_name):open()

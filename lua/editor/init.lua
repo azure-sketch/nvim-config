@@ -27,15 +27,7 @@ local function configure_buffer(buf)
   -- 通常の編集ファイルだけを対象にする。
   -- grug-farなどの専用画面には適用しない。
   if input.is_file_editor(buf) then
-    require("editor.lines").attach(buf)
-    require("editor.lsp").attach(buf, resume_input)
-    require("editor.navigation").attach_file(buf, resume_input)
-    require("editor.buffers").attach_file(buf, resume_input)
-    require("editor.comment").attach(buf)
-    require("editor.diagnostics").attach(buf, resume_input)
-    require("editor.format").attach(buf, resume_input)
-    require("editor.find").attach_file(buf, resume_input)
-    require("editor.selection").attach_file(buf)
+    keymaps.apply_file(buf, resume_input)
   end
 
   -- 通常ファイルとgrug-farの両方に共通のキー。

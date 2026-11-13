@@ -2,6 +2,7 @@ local M = {}
 
 local bindings = require("bindings")
 local input = require("editor.scope")
+local keymaps = require("editor.keymaps")
 
 local is_editable = input.is_editable
 local resume_input = input.resume
@@ -37,7 +38,8 @@ local function configure_buffer(buf)
     require("editor.selection").attach_file(buf)
   end
 
-  require("editor.save").attach(buf, resume_input)
+  -- 通常ファイルとgrug-farの両方に共通のキー。
+  keymaps.apply_area(buf, resume_input)
 
   bindings.apply("quick_open", quick_open, {
     buffer = buf,
@@ -48,12 +50,6 @@ local function configure_buffer(buf)
     buffer = buf,
     silent = true,
   })
-
-  require("editor.history").attach(buf)
-  require("editor.selection").attach(buf)
-  require("editor.navigation").attach(buf)
-  require("editor.find").attach(buf)
-  require("editor.buffers").attach(buf)
 end
 
 -- 入力開始後に、プラグイン初期化で上書きされ得るキーを再設定する。

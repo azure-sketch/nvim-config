@@ -27,17 +27,8 @@ local function new_file(resume_input)
   resume_input()
 end
 
-local function close_editor()
-  local ok, err = pcall(function()
-    require("astrocore.buffer").close()
-  end)
-
-  if not ok then
-    vim.notify(tostring(err), vim.log.levels.WARN)
-  end
-end
-
 -- 通常の編集ファイルだけに設定する。
+-- エディタを閉じるキーは editor/keymaps.lua にある。
 function M.attach_file(buf, resume_input)
   local map = keymap.for_buffer(buf)
 
@@ -52,14 +43,6 @@ function M.attach_file(buf, resume_input)
   map({ "n", "i" }, "<C-n>", function()
     new_file(resume_input)
   end, "New file")
-end
-
--- grug-farを含む、設定対象の編集領域に共通で設定する。
-function M.attach(buf)
-  local map = keymap.for_buffer(buf)
-
-  -- 強制破棄は行わず、既存の終了処理へ委譲する。
-  map({ "n", "i" }, "<C-w>", close_editor, "Close editor")
 end
 
 return M

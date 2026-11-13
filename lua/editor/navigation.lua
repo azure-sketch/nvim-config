@@ -70,6 +70,7 @@ local function go_to_line(resume_input)
 end
 
 -- 通常の編集ファイルだけに設定する。
+-- ファイルの先頭・末尾へ移動するキーは editor/keymaps.lua にある。
 function M.attach_file(buf, resume_input)
   local map = keymap.for_buffer(buf)
 
@@ -84,14 +85,6 @@ function M.attach_file(buf, resume_input)
   map({ "n", "i" }, "<C-g>", function()
     go_to_line(resume_input)
   end, "Go to line")
-end
-
--- grug-farを含む、設定対象の編集領域に共通で設定する。
-function M.attach(buf)
-  local map = keymap.for_buffer(buf)
-
-  map("i", "<C-Home>", "<C-o>gg<C-o>0", "Go to file start")
-  map("i", "<C-End>", "<C-o>G<C-o>$<Right>", "Go to file end")
 end
 
 return M

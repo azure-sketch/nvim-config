@@ -1,7 +1,7 @@
 local M = {}
 
 local bindings = require("bindings")
-local input = require("editor.input")
+local input = require("editor.scope")
 
 local is_editable = input.is_editable
 local resume_input = input.resume
@@ -88,8 +88,8 @@ local function schedule_editor_configuration(buf)
 end
 
 function M.setup()
-  require("editor.options").setup()
-  require("editor.trim").setup()
+  require("editor.global.options").setup()
+  require("editor.global.trim").setup()
 
   local group = vim.api.nvim_create_augroup(
     "Editor",

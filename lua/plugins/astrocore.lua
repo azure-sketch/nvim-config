@@ -50,25 +50,7 @@ return {
       g = {},
     },
 
-    autocmds = {
-      auto_save_on_focus_lost = {
-        {
-          event = { "FocusLost", "BufLeave" },
-          desc = "Save the current modified file buffer",
-          nested = true, -- 保存時の BufWritePre(トリム)を発火させる
-          callback = function(event)
-            local buf = event.buf
-            if vim.bo[buf].buftype == ""
-                and vim.bo[buf].modifiable
-                and vim.bo[buf].modified
-                and vim.api.nvim_buf_get_name(buf) ~= ""
-            then
-              vim.api.nvim_buf_call(buf, function() vim.cmd "silent! update" end)
-            end
-          end,
-        },
-      },
-    },
+    -- 自動保存などの編集動作は lua/editor/global/ に置く。
   },
 
   init = function()

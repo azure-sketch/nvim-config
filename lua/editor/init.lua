@@ -90,6 +90,7 @@ end
 function M.setup()
   require("editor.global.options").setup()
   require("editor.global.trim").setup()
+  require("editor.global.autosave").setup()
 
   local group = vim.api.nvim_create_augroup(
     "Editor",

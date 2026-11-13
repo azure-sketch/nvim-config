@@ -1,5 +1,7 @@
 local M = {}
 
+local scope = require("editor.scope")
+
 local function snapshot_buffers()
   local existing = {}
 
@@ -114,9 +116,9 @@ local function save_as(resume_input)
 end
 
 local function save(resume_input)
-  if vim.bo.filetype == "grug-far" then
+  if scope.is_input_area(0) then
     vim.notify(
-      "検索・置換画面では Ctrl+S で保存しません",
+      "この入力画面では Ctrl+S で保存しません",
       vim.log.levels.INFO
     )
     return

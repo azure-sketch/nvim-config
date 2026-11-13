@@ -4,6 +4,7 @@ local M = {}
 ---@field name string
 ---@field key string
 ---@field desc? string
+---@field input? boolean  -- true なら、ファイルエディタではない入力可能領域
 ---@field match fun(buf: integer): boolean
 ---@field open fun()
 ---@field close? fun(win: integer)

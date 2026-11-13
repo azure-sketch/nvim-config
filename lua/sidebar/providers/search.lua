@@ -1,12 +1,16 @@
 local INSTANCE = "sidebar-search"
+local FILETYPE = "grug-far"
 
 return {
   name = "search",
   key = "<C-S-f>",
   desc = "Focus search sidebar",
 
+  -- 入力できる領域。editor はこの宣言を見て入力領域と判定する。
+  input = true,
+
   match = function(buf)
-    return vim.bo[buf].filetype == "grug-far"
+    return vim.bo[buf].filetype == FILETYPE
   end,
 
   open = function()
@@ -21,18 +25,18 @@ return {
 
   -- 検索画面では、そのまま入力できる状態にする。
   on_focus = function(buf)
-    if vim.bo[buf].filetype == "grug-far" and vim.bo[buf].modifiable then
+    if vim.bo[buf].filetype == FILETYPE and vim.bo[buf].modifiable then
       vim.cmd("startinsert")
     end
   end,
 
   -- edgy.nvim 用の表示情報。
-  edgy = { title = "Search", help = "F1:Help", ft = "grug-far" },
+  edgy = { title = "Search", help = "F1:Help", ft = FILETYPE },
 
   setup = function()
     vim.api.nvim_create_autocmd("FileType", {
       group = vim.api.nvim_create_augroup("SidebarSearchBuffer", { clear = true }),
-      pattern = "grug-far",
+      pattern = FILETYPE,
       callback = function(event)
         local buf = event.buf
         vim.bo[buf].buflisted = false

@@ -71,6 +71,7 @@ function M.setup()
   require("editor.global.options").setup()
   require("editor.global.trim").setup()
   require("editor.global.autosave").setup()
+  require("editor.global.initial_buffer").setup()
 
   local group = vim.api.nvim_create_augroup(
     "Editor",
@@ -115,7 +116,7 @@ function M.setup()
 
   keymaps.apply_global(M.quick_open)
 
-  local sidebar_actions = require("sidebar.actions").setup(resume_input)
+  local sidebar_actions = require("sidebar").setup_actions(resume_input)
   M.toggle_sidebar = sidebar_actions.toggle_sidebar
 
   for _, buf in ipairs(vim.api.nvim_list_bufs()) do

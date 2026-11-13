@@ -3,7 +3,7 @@
 --
 -- 影響範囲:
 --   global: Neovim全体（ワークスペース共通のキーは lua/bindings.lua で定義）
---   area:   通常ファイルとgrug-farの両方
+--   area:   入力欄全体
 --   file:   通常ファイルのみ
 --
 -- 各項目: { モード, lhs, rhs, 説明, 追加オプション }
@@ -20,7 +20,7 @@ local function apply(buf, entries)
   end
 end
 
--- 通常ファイルとgrug-farの両方で使うキー。
+-- 入力欄で使うキー。
 local function area_entries(resume_input)
   local save = require("editor.area.save")
   local clipboard = require("editor.area.clipboard")

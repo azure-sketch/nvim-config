@@ -1,7 +1,5 @@
 local M = {}
 
-local keymap = require("keymap")
-
 local function show_problems(resume_input)
   vim.cmd("stopinsert")
 
@@ -19,12 +17,7 @@ local function show_problems(resume_input)
   picker.diagnostics()
 end
 
-function M.attach(buf, resume_input)
-  local map = keymap.for_buffer(buf)
-
-  map({ "n", "i" }, "<C-S-m>", function()
-    show_problems(resume_input)
-  end, "Show problems")
-end
+-- キーの割り当ては editor/keymaps.lua にある。
+M.show = show_problems
 
 return M

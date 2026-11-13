@@ -1,7 +1,5 @@
 local M = {}
 
-local keymap = require("keymap")
-
 local function format_document(resume_input)
   vim.cmd("stopinsert")
 
@@ -23,12 +21,7 @@ local function format_document(resume_input)
   resume_input()
 end
 
-function M.attach(buf, resume_input)
-  local map = keymap.for_buffer(buf)
-
-  map({ "n", "i" }, "<A-S-f>", function()
-    format_document(resume_input)
-  end, "Format document")
-end
+-- キーの割り当ては editor/keymaps.lua にある。
+M.document = format_document
 
 return M

@@ -1,7 +1,5 @@
 local M = {}
 
-local keymap = require("keymap")
-
 local function keycode(keys)
   return vim.api.nvim_replace_termcodes(
     keys, true, false, true
@@ -92,73 +90,62 @@ local function handle_hover_prefix(show_hover)
   )
 end
 
-function M.attach(buf, resume_input)
-  local map = keymap.for_buffer(buf)
+local show_hover = lsp_action(
+  "textDocument/hover",
+  function()
+    vim.lsp.buf.hover()
+  end
+)
 
-  local show_hover = lsp_action(
-    "textDocument/hover",
+-- キーの割り当ては editor/keymaps.lua にある。
+M.code_action = lsp_action(
+  "textDocument/codeAction",
+  function()
+    vim.lsp.buf.code_action()
+  end
+)
+
+function M.hover_prefix()
+  handle_hover_prefix(show_hover)
+end
+
+M.definition = lsp_action(
+  "textDocument/definition",
+  function()
+    vim.lsp.buf.definition()
+  end
+)
+
+M.references = lsp_action(
+  "textDocument/references",
+  function()
+    vim.lsp.buf.references()
+  end
+)
+
+M.rename = lsp_action(
+  "textDocument/rename",
+  function()
+    vim.lsp.buf.rename()
+  end
+)
+
+function M.document_symbols(resume_input)
+  return lsp_action(
+    "textDocument/documentSymbol",
     function()
-      vim.lsp.buf.hover()
+      open_symbol_picker("lsp_symbols", resume_input)
     end
   )
+end
 
-  map({ "n", "i" }, "<C-.>",
-    lsp_action(
-      "textDocument/codeAction",
-      function()
-        vim.lsp.buf.code_action()
-      end
-    ),
-    "Show code actions")
-
-  map({ "n", "i" }, "<C-k>", function()
-    handle_hover_prefix(show_hover)
-  end, "VS Code-style Ctrl+K prefix")
-
-  map({ "n", "i" }, "<F12>",
-    lsp_action(
-      "textDocument/definition",
-      function()
-        vim.lsp.buf.definition()
-      end
-    ),
-    "Go to definition")
-
-  map({ "n", "i" }, "<F24>",
-    lsp_action(
-      "textDocument/references",
-      function()
-        vim.lsp.buf.references()
-      end
-    ),
-    "Find references")
-
-  map({ "n", "i" }, "<F2>",
-    lsp_action(
-      "textDocument/rename",
-      function()
-        vim.lsp.buf.rename()
-      end
-    ),
-    "Rename symbol")
-
-  map({ "n", "i" }, "<C-S-o>",
-    lsp_action(
-      "textDocument/documentSymbol",
-      function()
-        open_symbol_picker("lsp_symbols", resume_input)
-      end
-    ),
-    "Go to symbol in file")
-
-  map({ "n", "i" }, "<C-t>",
-    lsp_action(
-      "workspace/symbol",
-      function()
-        open_symbol_picker("lsp_workspace_symbols", resume_input)
-      end
-    ),
-    "Go to symbol in workspace")
+function M.workspace_symbols(resume_input)
+  return lsp_action(
+    "workspace/symbol",
+    function()
+      open_symbol_picker("lsp_workspace_symbols", resume_input)
+    end
+  )
 end
 
 return M

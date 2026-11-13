@@ -1,7 +1,5 @@
 local M = {}
 
-local keymap = require("keymap")
-
 -- ジャンプ履歴を移動し、編集可能なら入力へ戻る。
 local function navigate_jump(key, resume_input)
   vim.cmd("stopinsert")
@@ -69,29 +67,15 @@ local function go_to_line(resume_input)
   end)
 end
 
--- 通常の編集ファイルだけに設定する。
-function M.attach_file(buf, resume_input)
-  local map = keymap.for_buffer(buf)
-
-  map({ "n", "i" }, "<A-Left>", function()
-    navigate_jump("<C-o>", resume_input)
-  end, "Go back")
-
-  map({ "n", "i" }, "<A-Right>", function()
-    navigate_jump("<C-i>", resume_input)
-  end, "Go forward")
-
-  map({ "n", "i" }, "<C-g>", function()
-    go_to_line(resume_input)
-  end, "Go to line")
+-- キーの割り当ては editor/keymaps.lua にある。
+function M.back(resume_input)
+  navigate_jump("<C-o>", resume_input)
 end
 
--- grug-farを含む、設定対象の編集領域に共通で設定する。
-function M.attach(buf)
-  local map = keymap.for_buffer(buf)
-
-  map("i", "<C-Home>", "<C-o>gg<C-o>0", "Go to file start")
-  map("i", "<C-End>", "<C-o>G<C-o>$<Right>", "Go to file end")
+function M.forward(resume_input)
+  navigate_jump("<C-i>", resume_input)
 end
+
+M.go_to_line = go_to_line
 
 return M

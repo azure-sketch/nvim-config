@@ -1,3 +1,5 @@
+-- 行番号やインデントなどの一般設定は plugins/astrocore.lua に置く。
+-- ここには、選択・入力動作に関係する設定だけを置く。
 local M = {}
 
 function M.setup()

@@ -1,7 +1,5 @@
 local M = {}
 
-local keymap = require("keymap")
-
 local function snapshot_buffers()
   local existing = {}
 
@@ -136,16 +134,8 @@ local function save(resume_input)
   end
 end
 
-function M.attach(buf, resume_input)
-  local map = keymap.for_buffer(buf)
-
-  map({ "n", "i", "s", "x" }, "<C-s>", function()
-    save(resume_input)
-  end, "Save file")
-
-  map({ "n", "i" }, "<C-S-s>", function()
-    save_as(resume_input)
-  end, "Save file as")
-end
+-- キーの割り当ては editor/keymaps.lua にある。
+M.write = save
+M.save_as = save_as
 
 return M

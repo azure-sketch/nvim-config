@@ -102,6 +102,12 @@ function M.edgy_views()
   return items
 end
 
+-- 編集領域から呼ぶ入口。Ctrl+B・Ctrl+1 のアクションを登録して返す。
+-- sidebar.actions は require("sidebar") を使うため、ここで遅延して読み込む。
+function M.setup_actions(resume_input)
+  return require("sidebar.actions").setup(resume_input)
+end
+
 -- 登録、各ビューの初期化、キー割り当てを行う。
 function M.setup()
   if initialized then

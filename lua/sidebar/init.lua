@@ -2,24 +2,32 @@ local M = {}
 
 local views = require("sidebar.views")
 
-local last_view = "files"
+-- 有効にするプロバイダ。追加時はここに1行足す。表示順・キー登録順もこの順。
+local PROVIDERS = { "files", "search", "git" }
 
-local function validate_name(name)
-  if name ~= "files"
-      and name ~= "search"
-      and name ~= "git"
-  then
+local last_view
+local initialized = false
+
+local function provider(name)
+  local spec = views.get(name)
+
+  if not spec then
     error("Unknown sidebar view: " .. tostring(name))
   end
+
+  return spec
+end
+
+local function is_sidebar(buf)
+  return views.name_of(buf) ~= nil
 end
 
 local function goto_editor()
   require("edgy").goto_main()
 
   local current = vim.api.nvim_get_current_win()
-  local buf = vim.api.nvim_win_get_buf(current)
 
-  if not views.is_view(buf, "files") and not views.is_view(buf, "search") and not views.is_view(buf, "git") then
+  if not is_sidebar(vim.api.nvim_win_get_buf(current)) then
     return current
   end
 
@@ -28,9 +36,7 @@ local function goto_editor()
 
     if vim.api.nvim_win_get_config(win).relative == ""
         and vim.bo[b].buftype == ""
-        and not views.is_view(b, "files")
-        and not views.is_view(b, "search")
-        and not views.is_view(b, "git")
+        and not is_sidebar(b)
     then
       vim.api.nvim_set_current_win(win)
       return win
@@ -41,35 +47,47 @@ local function goto_editor()
 end
 
 local function close_views()
-  if views.find("files") then
-    vim.cmd("Neotree action=close source=filesystem")
-  end
-
-  for _, name in ipairs({ "search", "git" }) do
+  for _, name in ipairs(views.names()) do
     local win = views.find(name)
 
-    if win and vim.api.nvim_win_is_valid(win) then
-      vim.api.nvim_win_close(win, false)
+    if win then
+      local spec = views.get(name)
+
+      if spec.close then
+        spec.close(win)
+      elseif vim.api.nvim_win_is_valid(win) then
+        vim.api.nvim_win_close(win, false)
+      end
     end
   end
 end
 
-local function open_search()
-  local grug = require("grug-far")
-  local instance_name = "sidebar-search"
-
-  if grug.has_instance(instance_name) then
-    grug.get_instance(instance_name):open()
-  else
-    grug.open({
-      instanceName = instance_name,
-      staticTitle = "Search",
-    })
+-- プロバイダを登録し、キー割り当てと各ビューの初期化を行う。
+function M.setup()
+  if initialized then
+    return
   end
+  initialized = true
+
+  for _, name in ipairs(PROVIDERS) do
+    views.register(require("sidebar.providers." .. name))
+  end
+
+  last_view = PROVIDERS[1]
+
+  for _, name in ipairs(views.names()) do
+    local spec = views.get(name)
+
+    if spec.setup then
+      spec.setup()
+    end
+  end
+
+  require("sidebar.keys").setup()
 end
 
 function M.toggle(name)
-  validate_name(name)
+  local spec = provider(name)
   last_view = name
 
   local was_visible = views.find(name) ~= nil
@@ -81,18 +99,8 @@ function M.toggle(name)
     vim.api.nvim_set_current_win(editor)
   end
 
-  if was_visible then
-    return
-  end
-
-  if name == "files" then
-    vim.cmd(
-      "Neotree action=focus source=filesystem position=left"
-    )
-  elseif name == "search" then
-    open_search()
-  else
-    vim.cmd("Git")
+  if not was_visible then
+    spec.open()
   end
 end
 
@@ -124,7 +132,7 @@ end
 -- 指定したサイドバーへフォーカスする。
 -- 表示中の場合は閉じず、非表示の場合だけ開く。
 function M.focus(name)
-  validate_name(name)
+  local spec = provider(name)
 
   vim.cmd("stopinsert")
   last_view = name
@@ -137,15 +145,8 @@ function M.focus(name)
     M.toggle(name)
   end
 
-  -- 検索画面では、そのまま入力できる状態にする。
-  if name == "search" then
-    local buf = vim.api.nvim_get_current_buf()
-
-    if vim.bo[buf].filetype == "grug-far"
-        and vim.bo[buf].modifiable
-    then
-      vim.cmd("startinsert")
-    end
+  if spec.on_focus then
+    spec.on_focus(vim.api.nvim_get_current_buf())
   end
 end
 

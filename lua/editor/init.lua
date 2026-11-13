@@ -1,23 +1,26 @@
 local M = {}
 
-local bindings = require("bindings")
 local input = require("editor.scope")
 local keymaps = require("editor.keymaps")
 
 local is_editable = input.is_editable
 local resume_input = input.resume
 
-local function quick_open()
-  if M.quick_open then
-    M.quick_open()
-  end
-end
+-- quick_open と toggle_sidebar は setup() の中で設定されるため、
+-- キーを押した時点で参照する。
+local workspace_actions = {
+  quick_open = function()
+    if M.quick_open then
+      M.quick_open()
+    end
+  end,
 
-local function toggle_sidebar()
-  if M.toggle_sidebar then
-    M.toggle_sidebar()
-  end
-end
+  toggle_sidebar = function()
+    if M.toggle_sidebar then
+      M.toggle_sidebar()
+    end
+  end,
+}
 
 local function configure_buffer(buf)
   if not is_editable(buf) then
@@ -33,15 +36,8 @@ local function configure_buffer(buf)
   -- 通常ファイルとgrug-farの両方に共通のキー。
   keymaps.apply_area(buf, resume_input)
 
-  bindings.apply("quick_open", quick_open, {
-    buffer = buf,
-    silent = true,
-  })
-
-  bindings.apply("toggle_sidebar", toggle_sidebar, {
-    buffer = buf,
-    silent = true,
-  })
+  -- ワークスペース共通のキー。
+  keymaps.apply_workspace(buf, workspace_actions)
 end
 
 -- 入力開始後に、プラグイン初期化で上書きされ得るキーを再設定する。
@@ -55,11 +51,7 @@ local function schedule_quick_open_refresh(buf)
       return
     end
 
-    bindings.apply("quick_open", quick_open, {
-      modes = "i",
-      buffer = buf,
-      silent = true,
-    })
+    keymaps.refresh_quick_open(buf, workspace_actions)
   end)
 end
 
@@ -115,10 +107,15 @@ function M.setup()
     callback = resume_input,
   })
 
-  local editor_actions = require("editor.quick_open").setup(resume_input)
-  local sidebar_actions = require("sidebar.actions").setup(resume_input)
+  local quick_open = require("editor.global.quick_open")
 
-  M.quick_open = editor_actions.quick_open
+  M.quick_open = function()
+    quick_open.open(resume_input)
+  end
+
+  keymaps.apply_global(M.quick_open)
+
+  local sidebar_actions = require("sidebar.actions").setup(resume_input)
   M.toggle_sidebar = sidebar_actions.toggle_sidebar
 
   for _, buf in ipairs(vim.api.nvim_list_bufs()) do

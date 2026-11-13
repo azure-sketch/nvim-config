@@ -1,13 +1,15 @@
 -- editorのキー定義を、影響範囲ごとに一覧で管理する。
--- 動作の実装は area/ と file/ に置き、ここでは「どのキーで何を呼ぶか」だけを書く。
+-- 動作の実装は global/、area/、file/ に置き、ここでは「どのキーで何を呼ぶか」だけを書く。
 --
 -- 影響範囲:
---   area: 通常ファイルとgrug-farの両方
---   file: 通常ファイルのみ
+--   global: Neovim全体（ワークスペース共通のキーは lua/bindings.lua で定義）
+--   area:   通常ファイルとgrug-farの両方
+--   file:   通常ファイルのみ
 --
 -- 各項目: { モード, lhs, rhs, 説明, 追加オプション }
 local M = {}
 
+local bindings = require("bindings")
 local keymap = require("keymap")
 
 local function apply(buf, entries)
@@ -244,6 +246,38 @@ local function file_entries(resume_input)
   })
 
   return entries
+end
+
+-- Neovim全体に割り当てるキー。
+-- quick_open のキーは lua/bindings.lua で定義されている。
+function M.apply_global(quick_open)
+  bindings.apply("quick_open", quick_open)
+
+  keymap.set({ "n", "i", "s", "x" }, "<C-S-p>", "<Esc>:", {
+    desc = "Command line",
+  })
+end
+
+-- ワークスペース共通のキー（lua/bindings.lua）を編集バッファにも割り当てる。
+function M.apply_workspace(buf, actions)
+  bindings.apply("quick_open", actions.quick_open, {
+    buffer = buf,
+    silent = true,
+  })
+
+  bindings.apply("toggle_sidebar", actions.toggle_sidebar, {
+    buffer = buf,
+    silent = true,
+  })
+end
+
+-- 入力開始後に、プラグイン初期化で上書きされ得るキーを再設定する。
+function M.refresh_quick_open(buf, actions)
+  bindings.apply("quick_open", actions.quick_open, {
+    modes = "i",
+    buffer = buf,
+    silent = true,
+  })
 end
 
 function M.apply_file(buf, resume_input)

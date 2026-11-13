@@ -16,23 +16,44 @@ local function is_blank(buf)
   return #lines <= 1 and (lines[1] or "") == ""
 end
 
--- 起動時に自動で作られた、名前なし・空・未変更のバッファを探す。
-local function find_initial()
-  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-    if vim.bo[buf].buflisted and is_blank(buf) then
-      return buf
-    end
+-- 名前付きの通常ファイルか判定する。ディレクトリのバッファは含めない。
+local function is_named_file(buf)
+  if not vim.api.nvim_buf_is_valid(buf)
+      or vim.bo[buf].buftype ~= ""
+      or not vim.bo[buf].buflisted
+  then
+    return false
   end
+
+  local name = vim.api.nvim_buf_get_name(buf)
+  return name ~= "" and vim.fn.isdirectory(name) == 0
 end
 
--- 起動直後の空バッファ(Untitled)だけを記憶し、
--- 名前付きのファイルを開いた後で削除する。
--- Ctrl+N で作った新規バッファは対象にしない。
+-- `nvim .` の起動直後に現れる空バッファ(Untitled)を記憶し、
+-- 最初に名前付きファイルを開いた後で削除する。
+--
+-- Neo-tree はディレクトリを開いた後に空バッファを作るため、
+-- setup() 時点では存在しないことがある。BufEnter でも記憶する。
+-- 最初のファイルを開いた後に作られたバッファ(Ctrl+N など)は対象にしない。
 function M.setup()
-  local initial = find_initial()
+  -- ファイルを指定して起動した場合は、起動時の空バッファが無い。
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    if is_named_file(buf) then
+      return
+    end
+  end
 
-  if not initial then
-    return
+  local pending = {}
+  local settled = false
+
+  local function remember(buf)
+    if vim.bo[buf].buflisted and is_blank(buf) then
+      pending[buf] = true
+    end
+  end
+
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    remember(buf)
   end
 
   local group = vim.api.nvim_create_augroup(
@@ -46,31 +67,32 @@ function M.setup()
 
   vim.api.nvim_create_autocmd("BufEnter", {
     group = group,
-    desc = "Discard the initial empty buffer after a file is opened",
+    desc = "Discard startup empty buffers after the first file is opened",
     callback = function(event)
-      -- 名前付きの通常ファイルに入ったときだけ対象にする。
-      if event.buf == initial
-          or vim.bo[event.buf].buftype ~= ""
-          or not vim.bo[event.buf].buflisted
-          or vim.api.nvim_buf_get_name(event.buf) == ""
-      then
+      if not is_named_file(event.buf) then
+        if not settled then
+          remember(event.buf)
+        end
         return
       end
 
+      settled = true
+
       vim.schedule(function()
-        -- 削除済み、または入力済みなら、以後は対象にしない。
-        if not is_blank(initial) then
+        for buf in pairs(pending) do
+          if not is_blank(buf) then
+            -- 入力済み、または削除済みなら対象から外す。
+            pending[buf] = nil
+          elseif #vim.fn.win_findbuf(buf) == 0 then
+            pending[buf] = nil
+            pcall(vim.api.nvim_buf_delete, buf, {})
+          end
+          -- 表示中なら、次のファイルを開いたときまで待つ。
+        end
+
+        if next(pending) == nil then
           stop()
-          return
         end
-
-        -- まだ表示中なら、次の機会まで待つ。
-        if #vim.fn.win_findbuf(initial) > 0 then
-          return
-        end
-
-        vim.api.nvim_buf_delete(initial, {})
-        stop()
       end)
     end,
   })

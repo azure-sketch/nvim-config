@@ -11,6 +11,9 @@ return {
     vim.cmd("Git")
   end,
 
+  -- edgy.nvim 用の表示情報。
+  edgy = { title = "Git", help = "g?:Help", ft = "fugitive" },
+
   setup = function()
     local group = vim.api.nvim_create_augroup("SidebarGitBuffer", { clear = true })
 

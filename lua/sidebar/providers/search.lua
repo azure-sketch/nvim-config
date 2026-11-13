@@ -26,6 +26,9 @@ return {
     end
   end,
 
+  -- edgy.nvim 用の表示情報。
+  edgy = { title = "Search", help = "F1:Help", ft = "grug-far" },
+
   setup = function()
     vim.api.nvim_create_autocmd("FileType", {
       group = vim.api.nvim_create_augroup("SidebarSearchBuffer", { clear = true }),

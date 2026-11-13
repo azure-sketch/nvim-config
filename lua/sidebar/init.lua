@@ -6,6 +6,7 @@ local views = require("sidebar.views")
 local PROVIDERS = { "files", "search", "git" }
 
 local last_view
+local loaded = false
 local initialized = false
 
 local function provider(name)
@@ -62,18 +63,53 @@ local function close_views()
   end
 end
 
--- プロバイダを登録し、キー割り当てと各ビューの初期化を行う。
-function M.setup()
-  if initialized then
+-- プロバイダを登録する(複数回呼んでも1度だけ)。
+function M.load()
+  if loaded then
     return
   end
-  initialized = true
+  loaded = true
 
   for _, name in ipairs(PROVIDERS) do
     views.register(require("sidebar.providers." .. name))
   end
 
   last_view = PROVIDERS[1]
+end
+
+-- edgy.nvim の left 用ウィンドウ定義を、登録順に生成する。
+function M.edgy_views()
+  M.load()
+
+  local items = {}
+
+  for _, name in ipairs(views.names()) do
+    local e = views.get(name).edgy
+
+    if e then
+      local winbar = e.help and (" %s%%= %s "):format(e.title, e.help)
+        or (" %s "):format(e.title)
+
+      items[#items + 1] = {
+        title = e.title,
+        wo = { winbar = winbar },
+        ft = e.ft,
+        filter = e.filter,
+      }
+    end
+  end
+
+  return items
+end
+
+-- 登録、各ビューの初期化、キー割り当てを行う。
+function M.setup()
+  if initialized then
+    return
+  end
+  initialized = true
+
+  M.load()
 
   for _, name in ipairs(views.names()) do
     local spec = views.get(name)

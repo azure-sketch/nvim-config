@@ -9,6 +9,7 @@ local M = {}
 ---@field close? fun(win: integer)
 ---@field on_focus? fun(buf: integer)
 ---@field setup? fun()
+---@field edgy? { title: string, help?: string, ft: string, filter?: fun(buf: integer): boolean }
 
 local specs = {}
 local order = {}

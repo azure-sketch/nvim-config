@@ -77,7 +77,7 @@ return {
       once = true,
       callback = function()
         require("editor").setup()
-        require("sidebar.keys").setup()
+        require("sidebar").setup()
       end,
     })
   end,

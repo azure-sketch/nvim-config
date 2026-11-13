@@ -32,17 +32,13 @@ local function attach(buf)
     })
   end
 
-  map("<C-S-e>", function()
-    sidebar.focus("files")
-  end, "Focus files sidebar")
+  for _, name in ipairs(views.names()) do
+    local spec = views.get(name)
 
-  map("<C-S-f>", function()
-    sidebar.focus("search")
-  end, "Focus search sidebar")
-
-  map("<C-S-g>", function()
-    sidebar.focus("git")
-  end, "Focus Git sidebar")
+    map(spec.key, function()
+      sidebar.focus(name)
+    end, spec.desc or ("Focus " .. name .. " sidebar"))
+  end
 
   map("<C-0>", sidebar.focus_last, "Focus sidebar")
 end

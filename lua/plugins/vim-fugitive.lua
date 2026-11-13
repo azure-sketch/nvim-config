@@ -19,9 +19,5 @@ return {
         desc = "Sidebar: Close diff, keep working file",
       },
     },
-
-    init = function()
-      require("sidebar.git").setup()
-    end,
   },
 }

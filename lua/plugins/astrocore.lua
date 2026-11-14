@@ -16,6 +16,7 @@ return {
     diagnostics = {
       virtual_text = true,
       underline = true,
+      update_in_insert = true,
     },
 
     options = {

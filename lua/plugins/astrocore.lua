@@ -16,6 +16,7 @@ return {
     diagnostics = {
       virtual_text = true,
       underline = true,
+      update_in_insert = true,
     },
 
     options = {
@@ -47,6 +48,10 @@ return {
       },
 
       g = {},
+    },
+
+    treesitter = {
+      ensure_installed = { "javascript", "typescript", "tsx", "jsdoc" },
     },
 
     -- 自動保存などの編集動作は lua/editor/global/ に置く。

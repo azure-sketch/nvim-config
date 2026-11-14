@@ -49,6 +49,10 @@ return {
       g = {},
     },
 
+    treesitter = {
+      ensure_installed = { "javascript", "typescript", "tsx", "jsdoc" },
+    },
+
     -- 自動保存などの編集動作は lua/editor/global/ に置く。
   },
 

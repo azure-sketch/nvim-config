@@ -22,14 +22,23 @@ return {
       },
     },
 
-    -- JS/TS は Biome だけが整形する。JSON は Biome が接続していれば Biome、なければ jsonls が整形する。
+    -- 整形を担当するサーバー
+    --   JS/TS: Biome のみ
+    --   astro: astro サーバーのみ（Biome は整形しない）
+    --   html: html サーバーのみ（Biome は整形しない）
+    --   css・JSON: Biome が接続していれば Biome、なければ cssls・jsonls
     -- 保存時の整形（既定の有効）は変更しない。
     formatting = {
       disabled = { "vtsls", "eslint" },
       filter = function(client)
-        if client.name ~= "jsonls" then return true end
         local bufnr = vim.api.nvim_get_current_buf()
-        return #vim.lsp.get_clients { bufnr = bufnr, name = "biome" } == 0
+        local filetype = vim.bo[bufnr].filetype
+        if filetype == "astro" then return client.name == "astro" end
+        if filetype == "html" then return client.name == "html" end
+        if client.name == "jsonls" or client.name == "cssls" then
+          return #vim.lsp.get_clients { bufnr = bufnr, name = "biome" } == 0
+        end
+        return true
       end,
     },
   },

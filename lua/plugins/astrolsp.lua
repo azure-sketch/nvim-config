@@ -7,7 +7,7 @@ return {
     -- 有効にする言語サーバー（サーバー固有の設定は after/lsp/ に置く）
     -- eslint・biome は、プロジェクトに設定ファイルがあるときだけ起動する（nvim-lspconfig の root_dir）
     -- Rust の rust-analyzer は rustaceanvim が起動するので、ここには書かない
-    servers = { "vtsls", "eslint", "biome", "jsonls", "taplo" },
+    servers = { "vtsls", "eslint", "biome", "jsonls", "taplo", "astro", "html", "cssls", "tailwindcss" },
 
     -- LSP のファイル操作通知（import 自動更新などに必要）
     file_operations = {
@@ -22,14 +22,23 @@ return {
       },
     },
 
-    -- JS/TS は Biome だけが整形する。JSON は Biome が接続していれば Biome、なければ jsonls が整形する。
+    -- 整形を担当するサーバー
+    --   JS/TS: Biome のみ
+    --   astro: Biome のみ（html.experimentalFullSupportEnabled が必要。astro サーバーは Prettier がないため使わない）
+    --   html: html サーバーのみ（Biome は整形しない）
+    --   css・JSON: Biome が接続していれば Biome、なければ cssls・jsonls
     -- 保存時の整形（既定の有効）は変更しない。
     formatting = {
       disabled = { "vtsls", "eslint" },
       filter = function(client)
-        if client.name ~= "jsonls" then return true end
         local bufnr = vim.api.nvim_get_current_buf()
-        return #vim.lsp.get_clients { bufnr = bufnr, name = "biome" } == 0
+        local filetype = vim.bo[bufnr].filetype
+        if filetype == "astro" then return client.name == "biome" end
+        if filetype == "html" then return client.name == "html" end
+        if client.name == "jsonls" or client.name == "cssls" then
+          return #vim.lsp.get_clients { bufnr = bufnr, name = "biome" } == 0
+        end
+        return true
       end,
     },
   },

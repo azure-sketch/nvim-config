@@ -24,7 +24,7 @@ return {
 
     -- 整形を担当するサーバー
     --   JS/TS: Biome のみ
-    --   astro: astro サーバーのみ（Biome は整形しない）
+    --   astro: Biome のみ（html.experimentalFullSupportEnabled が必要。astro サーバーは Prettier がないため使わない）
     --   html: html サーバーのみ（Biome は整形しない）
     --   css・JSON: Biome が接続していれば Biome、なければ cssls・jsonls
     -- 保存時の整形（既定の有効）は変更しない。
@@ -33,7 +33,7 @@ return {
       filter = function(client)
         local bufnr = vim.api.nvim_get_current_buf()
         local filetype = vim.bo[bufnr].filetype
-        if filetype == "astro" then return client.name == "astro" end
+        if filetype == "astro" then return client.name == "biome" end
         if filetype == "html" then return client.name == "html" end
         if client.name == "jsonls" or client.name == "cssls" then
           return #vim.lsp.get_clients { bufnr = bufnr, name = "biome" } == 0

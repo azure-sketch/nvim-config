@@ -69,6 +69,8 @@ end
 
 function M.setup()
   require("editor.global.options").setup()
+  -- 保存時のコードアクションは、trim より先に登録する（trim が最後に空白を整えるため）。
+  require("editor.global.code_actions_on_save").setup()
   require("editor.global.trim").setup()
   require("editor.global.autosave").setup()
   require("editor.global.initial_buffer").setup()

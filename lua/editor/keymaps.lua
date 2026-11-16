@@ -247,6 +247,55 @@ local function file_entries(resume_input)
     { "n", "<C-x>", '"+dd', "Cut current line" },
   })
 
+  -- 選択範囲を使わない操作は、選択を解除してから実行する。
+  local deselect = selection.without_selection
+  vim.list_extend(entries, {
+    { { "s", "x" }, "<C-S-s>", deselect(function()
+      save.save_as(resume_input)
+    end), "Save file as" },
+    { { "s", "x" }, "<C-w>", deselect(buffers.close), "Close editor" },
+    { { "s", "x" }, "<C-f>", "<Esc>/", "Find in file" },
+    { { "s", "x" }, "<F3>", deselect(find.next_match), "Next match" },
+    { { "s", "x" }, "<S-F3>", deselect(find.prev_match), "Previous match" },
+    { { "s", "x" }, "<C-Home>", "<Esc>gg0", "Go to file start" },
+    { { "s", "x" }, "<C-End>", "<Esc>G$", "Go to file end" },
+    { { "s", "x" }, "<C-PageUp>", deselect(function()
+      buffers.switch(-1, resume_input)
+    end), "Previous editor" },
+    { { "s", "x" }, "<C-PageDown>", deselect(function()
+      buffers.switch(1, resume_input)
+    end), "Next editor" },
+    { { "s", "x" }, "<C-n>", deselect(function()
+      buffers.new_file(resume_input)
+    end), "New file" },
+    { { "s", "x" }, "<A-Left>", deselect(function()
+      navigation.back(resume_input)
+    end), "Go back" },
+    { { "s", "x" }, "<A-Right>", deselect(function()
+      navigation.forward(resume_input)
+    end), "Go forward" },
+    { { "s", "x" }, "<C-g>", deselect(function()
+      navigation.go_to_line(resume_input)
+    end), "Go to line" },
+    { { "s", "x" }, "<C-S-m>", deselect(function()
+      problems.show(resume_input)
+    end), "Show problems" },
+    { { "s", "x" }, "<A-S-f>", deselect(function()
+      format.document(resume_input)
+    end), "Format document" },
+    { { "s", "x" }, "<C-h>", deselect(function()
+      replace.open(resume_input)
+    end), "Replace in current file" },
+    { { "s", "x" }, "<C-k>", deselect(lsp.hover_prefix), "VS Code-style Ctrl+K prefix" },
+    { { "s", "x" }, "<F12>", deselect(lsp.definition), "Go to definition" },
+    { { "s", "x" }, "<F24>", deselect(lsp.references), "Find references" },
+    { { "s", "x" }, "<F2>", deselect(lsp.rename), "Rename symbol" },
+    { { "s", "x" }, "<C-S-o>", deselect(lsp.document_symbols(resume_input)),
+      "Go to symbol in file" },
+    { { "s", "x" }, "<C-t>", deselect(lsp.workspace_symbols(resume_input)),
+      "Go to symbol in workspace" },
+  })
+
   return entries
 end
 

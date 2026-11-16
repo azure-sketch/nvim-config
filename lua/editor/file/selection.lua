@@ -22,4 +22,17 @@ function M.expand_visual_line()
   return "V<C-g>"
 end
 
+-- Select／Visualの選択を解除してから、指定した操作を実行する。
+-- Normalへの遷移で予約される入力復帰より先に、操作を実行する。
+function M.without_selection(action)
+  return function()
+    vim.cmd.normal({
+      vim.api.nvim_replace_termcodes("<Esc>", true, false, true),
+      bang = true,
+    })
+
+    action()
+  end
+end
+
 return M

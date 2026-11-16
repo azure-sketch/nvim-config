@@ -18,6 +18,7 @@ return {
       "shellcheck",
       "shfmt",
       "yaml-language-server",
+      "marksman",
     })
   end,
 }

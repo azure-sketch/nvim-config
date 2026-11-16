@@ -8,7 +8,7 @@ return {
     -- eslint・biome は、プロジェクトに設定ファイルがあるときだけ起動する（nvim-lspconfig の root_dir）
     -- Rust の rust-analyzer は rustaceanvim が起動するので、ここには書かない
     -- mise は mise 本体の `mise lsp` を使う（Mason では入れない。設定は after/lsp/mise.lua）
-    servers = { "vtsls", "eslint", "biome", "jsonls", "taplo", "astro", "html", "cssls", "tailwindcss", "bashls", "yamlls", "mise" },
+    servers = { "vtsls", "eslint", "biome", "jsonls", "taplo", "astro", "html", "cssls", "tailwindcss", "bashls", "yamlls", "mise", "marksman" },
 
     -- LSP のファイル操作通知（import 自動更新などに必要）
     file_operations = {

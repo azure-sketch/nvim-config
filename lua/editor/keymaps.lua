@@ -24,17 +24,12 @@ end
 local function area_entries(resume_input)
   local save = require("editor.area.save")
   local clipboard = require("editor.area.clipboard")
-  local find = require("editor.area.find")
-  local buffers = require("editor.area.buffers")
 
   return {
     -- 保存
     { { "n", "i", "s", "x" }, "<C-s>", function()
       save.write(resume_input)
     end, "Save file" },
-    { { "n", "i" }, "<C-S-s>", function()
-      save.save_as(resume_input)
-    end, "Save file as" },
 
     -- 元に戻す・やり直し
     { "i", "<C-z>", "<C-o>u", "Undo" },
@@ -63,6 +58,27 @@ local function area_entries(resume_input)
     -- 選択範囲を削除し、そのまま入力を続ける。
     { { "s", "x" }, "<BS>", '<C-g>"_c', "Delete selection" },
     { { "s", "x" }, "<Del>", '<C-g>"_c', "Delete selection" },
+  }
+end
+
+-- 通常ファイルだけで使うキー。
+local function file_entries(resume_input)
+  local save = require("editor.area.save")
+  local find = require("editor.file.find")
+  local lines = require("editor.file.lines")
+  local lsp = require("editor.file.lsp")
+  local navigation = require("editor.file.navigation")
+  local buffers = require("editor.file.buffers")
+  local problems = require("editor.file.problems")
+  local format = require("editor.file.format")
+  local replace = require("editor.file.replace")
+  local selection = require("editor.file.selection")
+
+  local entries = {
+    -- 名前を付けて保存。
+    { { "n", "i" }, "<C-S-s>", function()
+      save.save_as(resume_input)
+    end, "Save file as" },
 
     -- ファイルの先頭・末尾へ移動。
     { "i", "<C-Home>", "<C-o>gg<C-o>0", "Go to file start" },
@@ -77,20 +93,6 @@ local function area_entries(resume_input)
     -- 強制破棄は行わず、既存の終了処理へ委譲する。
     { { "n", "i" }, "<C-w>", buffers.close, "Close editor" },
   }
-end
-
--- 通常ファイルだけで使うキー。
-local function file_entries(resume_input)
-  local lines = require("editor.file.lines")
-  local lsp = require("editor.file.lsp")
-  local navigation = require("editor.file.navigation")
-  local buffers = require("editor.file.buffers")
-  local problems = require("editor.file.problems")
-  local format = require("editor.file.format")
-  local replace = require("editor.file.replace")
-  local selection = require("editor.file.selection")
-
-  local entries = {}
 
   -- 行の編集
   vim.list_extend(entries, {
@@ -113,6 +115,8 @@ local function file_entries(resume_input)
     { "n", "<C-CR>", "o", "Insert line below" },
     { "i", "<C-S-CR>", "<Esc>O", "Insert line above" },
     { "n", "<C-S-CR>", "O", "Insert line above" },
+    { { "s", "x" }, "<C-CR>", lines.insert_selected_below, "Insert line below selection" },
+    { { "s", "x" }, "<C-S-CR>", lines.insert_selected_above, "Insert line above selection" },
 
     -- 現在行を上下へ移動。
     { "i", "<A-Up>", "<C-o>:silent! move .-2<CR>", "Move line up" },
@@ -155,6 +159,9 @@ local function file_entries(resume_input)
   -- 言語サーバー
   vim.list_extend(entries, {
     { { "n", "i" }, "<C-.>", lsp.code_action, "Show code actions" },
+    { "x", "<C-.>", lsp.code_action, "Show code actions" },
+    { "s", "<C-.>", '<C-g><Cmd>lua require("editor.file.lsp").code_action()<CR>',
+      "Show code actions" },
     { { "n", "i" }, "<C-k>", lsp.hover_prefix, "VS Code-style Ctrl+K prefix" },
     { { "n", "i" }, "<F12>", lsp.definition, "Go to definition" },
     { { "n", "i" }, "<F24>", lsp.references, "Find references" },
@@ -243,6 +250,55 @@ local function file_entries(resume_input)
     { "n", "<C-c>", '"+yy', "Copy current line" },
     { "i", "<C-x>", '<C-o>"+dd', "Cut current line" },
     { "n", "<C-x>", '"+dd', "Cut current line" },
+  })
+
+  -- 選択範囲を使わない操作は、選択を解除してから実行する。
+  local deselect = selection.without_selection
+  vim.list_extend(entries, {
+    { { "s", "x" }, "<C-S-s>", deselect(function()
+      save.save_as(resume_input)
+    end), "Save file as" },
+    { { "s", "x" }, "<C-w>", deselect(buffers.close), "Close editor" },
+    { { "s", "x" }, "<C-f>", "<Esc>/", "Find in file" },
+    { { "s", "x" }, "<F3>", deselect(find.next_match), "Next match" },
+    { { "s", "x" }, "<S-F3>", deselect(find.prev_match), "Previous match" },
+    { { "s", "x" }, "<C-Home>", "<Esc>gg0", "Go to file start" },
+    { { "s", "x" }, "<C-End>", "<Esc>G$", "Go to file end" },
+    { { "s", "x" }, "<C-PageUp>", deselect(function()
+      buffers.switch(-1, resume_input)
+    end), "Previous editor" },
+    { { "s", "x" }, "<C-PageDown>", deselect(function()
+      buffers.switch(1, resume_input)
+    end), "Next editor" },
+    { { "s", "x" }, "<C-n>", deselect(function()
+      buffers.new_file(resume_input)
+    end), "New file" },
+    { { "s", "x" }, "<A-Left>", deselect(function()
+      navigation.back(resume_input)
+    end), "Go back" },
+    { { "s", "x" }, "<A-Right>", deselect(function()
+      navigation.forward(resume_input)
+    end), "Go forward" },
+    { { "s", "x" }, "<C-g>", deselect(function()
+      navigation.go_to_line(resume_input)
+    end), "Go to line" },
+    { { "s", "x" }, "<C-S-m>", deselect(function()
+      problems.show(resume_input)
+    end), "Show problems" },
+    { { "s", "x" }, "<A-S-f>", deselect(function()
+      format.document(resume_input)
+    end), "Format document" },
+    { { "s", "x" }, "<C-h>", deselect(function()
+      replace.open(resume_input)
+    end), "Replace in current file" },
+    { { "s", "x" }, "<C-k>", deselect(lsp.hover_prefix), "VS Code-style Ctrl+K prefix" },
+    { { "s", "x" }, "<F12>", deselect(lsp.definition), "Go to definition" },
+    { { "s", "x" }, "<F24>", deselect(lsp.references), "Find references" },
+    { { "s", "x" }, "<F2>", deselect(lsp.rename), "Rename symbol" },
+    { { "s", "x" }, "<C-S-o>", deselect(lsp.document_symbols(resume_input)),
+      "Go to symbol in file" },
+    { { "s", "x" }, "<C-t>", deselect(lsp.workspace_symbols(resume_input)),
+      "Go to symbol in workspace" },
   })
 
   return entries

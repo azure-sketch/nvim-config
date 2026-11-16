@@ -39,7 +39,8 @@ local function has_visible_file()
   return false
 end
 
--- `nvim .` の起動直後に現れる空バッファ(Untitled)を記憶し、
+-- `nvim .` の起動直後に現れる空バッファ(Untitled)を記憶する。
+-- ウィンドウに表示されていれば起動画面に置き換え、
 -- ウィンドウから外れた時点で、ファイルが表示されていれば削除する。
 --
 -- Neo-tree はディレクトリを開いた後に空バッファを作るため、
@@ -68,6 +69,19 @@ function M.setup()
   local function remember(buf)
     if vim.bo[buf].buflisted and is_blank(buf) then
       pending[buf] = true
+
+      -- 起動直後の空バッファは、起動画面に置き換える。
+      vim.schedule(function()
+        if settled or not pending[buf] or not is_blank(buf) then
+          return
+        end
+
+        local win = vim.fn.win_findbuf(buf)[1]
+
+        if win then
+          require("editor.global.dashboard").show(win)
+        end
+      end)
     end
   end
 

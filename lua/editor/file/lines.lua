@@ -51,8 +51,27 @@ local function duplicate_selected_lines(direction)
   end
 end
 
+local function insert_selected_line(direction)
+  return function()
+    local win = vim.api.nvim_get_current_win()
+    local anchor = vim.fn.getpos("v")[2]
+    local cursor = vim.api.nvim_win_get_cursor(win)[1]
+    local target = direction < 0
+        and math.min(anchor, cursor)
+        or math.max(anchor, cursor)
+
+    -- 選択範囲の外側へ行を追加し、本文はそのまま残す。
+    normal("<Esc>")
+    vim.api.nvim_win_set_cursor(win, { target, 0 })
+    normal(direction < 0 and "O" or "o")
+    vim.cmd("startinsert")
+  end
+end
+
 -- キーの割り当ては editor/keymaps.lua にある。
 M.duplicate_selected_up = duplicate_selected_lines(-1)
 M.duplicate_selected_down = duplicate_selected_lines(1)
+M.insert_selected_above = insert_selected_line(-1)
+M.insert_selected_below = insert_selected_line(1)
 
 return M

@@ -115,6 +115,8 @@ local function file_entries(resume_input)
     { "n", "<C-CR>", "o", "Insert line below" },
     { "i", "<C-S-CR>", "<Esc>O", "Insert line above" },
     { "n", "<C-S-CR>", "O", "Insert line above" },
+    { { "s", "x" }, "<C-CR>", lines.insert_selected_below, "Insert line below selection" },
+    { { "s", "x" }, "<C-S-CR>", lines.insert_selected_above, "Insert line above selection" },
 
     -- 現在行を上下へ移動。
     { "i", "<A-Up>", "<C-o>:silent! move .-2<CR>", "Move line up" },

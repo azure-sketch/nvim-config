@@ -1,19 +1,2 @@
-local M = {}
-
-local function move_match(command)
-  local ok, err = pcall(vim.cmd, command)
-
-  if not ok then
-    vim.notify(tostring(err), vim.log.levels.INFO)
-  end
-end
-
-function M.next_match()
-  move_match("normal! n")
-end
-
-function M.prev_match()
-  move_match("normal! N")
-end
-
-return M
+-- 参照元の移行が完了するまで、通常ファイル用の実装へ転送する。
+return require("editor.file.find")

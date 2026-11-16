@@ -64,8 +64,7 @@ end
 -- 通常ファイルだけで使うキー。
 local function file_entries(resume_input)
   local save = require("editor.area.save")
-  local find = require("editor.area.find")
-  local area_buffers = require("editor.area.buffers")
+  local find = require("editor.file.find")
   local lines = require("editor.file.lines")
   local lsp = require("editor.file.lsp")
   local navigation = require("editor.file.navigation")
@@ -92,7 +91,7 @@ local function file_entries(resume_input)
     { { "n", "i" }, "<S-F3>", find.prev_match, "Previous match" },
 
     -- 強制破棄は行わず、既存の終了処理へ委譲する。
-    { { "n", "i" }, "<C-w>", area_buffers.close, "Close editor" },
+    { { "n", "i" }, "<C-w>", buffers.close, "Close editor" },
   }
 
   -- 行の編集

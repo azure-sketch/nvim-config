@@ -47,7 +47,7 @@ end
 
 ---@type vim.lsp.Config
 return {
-  -- :BiomeOrganizeImports で手動実行できる（キーの割り当ては editor/keymaps.lua）。
+  -- :BiomeOrganizeImports で手動実行できる。
   -- 保存前（自動保存を含む）にも自動で実行する。失敗しても保存は止めない。
   on_attach = function(client, bufnr)
     vim.api.nvim_buf_create_user_command(bufnr, "BiomeOrganizeImports", function()

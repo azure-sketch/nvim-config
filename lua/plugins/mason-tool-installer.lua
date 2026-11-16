@@ -14,6 +14,10 @@ return {
       "html-lsp",
       "css-lsp",
       "tailwindcss-language-server",
+      "bash-language-server",
+      "shellcheck",
+      "shfmt",
+      "yaml-language-server",
     })
   end,
 }

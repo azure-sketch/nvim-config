@@ -7,7 +7,7 @@ return {
     -- 有効にする言語サーバー（サーバー固有の設定は after/lsp/ に置く）
     -- eslint・biome は、プロジェクトに設定ファイルがあるときだけ起動する（nvim-lspconfig の root_dir）
     -- Rust の rust-analyzer は rustaceanvim が起動するので、ここには書かない
-    servers = { "vtsls", "eslint", "biome", "jsonls", "taplo", "astro", "html", "cssls", "tailwindcss" },
+    servers = { "vtsls", "eslint", "biome", "jsonls", "taplo", "astro", "html", "cssls", "tailwindcss", "bashls", "yamlls" },
 
     -- LSP のファイル操作通知（import 自動更新などに必要）
     file_operations = {

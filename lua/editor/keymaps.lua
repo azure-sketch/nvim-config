@@ -241,6 +241,7 @@ local function file_entries(resume_input)
     { "x", "<C-l>", selection.expand_visual_line,
       "Expand line selection", { expr = true } },
 
+    -- 未選択なら現在行をOSクリップボードへコピー・切り取りする。
     { "i", "<C-c>", '<C-o>"+yy', "Copy current line" },
     { "n", "<C-c>", '"+yy', "Copy current line" },
     { "i", "<C-x>", '<C-o>"+dd', "Cut current line" },

@@ -3,44 +3,48 @@ local M = {}
 local sidebar = require("sidebar")
 local views = require("sidebar.views")
 
-local function eligible(buf)
-  if not vim.api.nvim_buf_is_valid(buf)
-      or not vim.api.nvim_buf_is_loaded(buf)
-  then
-    return false
-  end
+local MODES = { "n", "i", "s", "x" }
 
-  if views.name_of(buf) then
-    return true
-  end
-
-  return vim.bo[buf].buftype == ""
-      and vim.bo[buf].modifiable
-      and not vim.api.nvim_buf_get_name(buf):match("^fugitive://")
-end
-
-local function attach(buf)
-  if not eligible(buf) then
-    return
-  end
-
-  local function map(lhs, callback, desc)
-    vim.keymap.set({ "n", "i", "s", "x" }, lhs, callback, {
-      buffer = buf,
-      silent = true,
-      desc = desc,
-    })
-  end
+-- 割り当てるキーの定義。登録先（グローバル／サイドバーのバッファ）は共通。
+local function entries()
+  local list = {}
 
   for _, name in ipairs(views.names()) do
     local spec = views.get(name)
 
-    map(spec.key, function()
-      sidebar.focus(name)
-    end, spec.desc or ("Focus " .. name .. " sidebar"))
+    list[#list + 1] = {
+      spec.key,
+      function()
+        sidebar.focus(name)
+      end,
+      spec.desc or ("Focus " .. name .. " sidebar"),
+    }
   end
 
-  map("<C-0>", sidebar.focus_last, "Focus sidebar")
+  list[#list + 1] = { "<C-0>", sidebar.focus_last, "Focus sidebar" }
+
+  return list
+end
+
+local function map_all(opts)
+  for _, entry in ipairs(entries()) do
+    vim.keymap.set(MODES, entry[1], entry[2], vim.tbl_extend("force", {
+      silent = true,
+      desc = entry[3],
+    }, opts or {}))
+  end
+end
+
+-- サイドバーのバッファだけに、プラグインのバッファローカルなキーより優先して付ける。
+local function attach(buf)
+  if not vim.api.nvim_buf_is_valid(buf)
+      or not vim.api.nvim_buf_is_loaded(buf)
+      or not views.name_of(buf)
+  then
+    return
+  end
+
+  map_all({ buffer = buf })
 end
 
 local function schedule_configuration(event)
@@ -54,10 +58,7 @@ local function schedule_configuration(event)
 end
 
 function M.setup()
-  local group = vim.api.nvim_create_augroup(
-    "SidebarKeys",
-    { clear = true }
-  )
+  local group = vim.api.nvim_create_augroup("SidebarKeys", { clear = true })
 
   vim.api.nvim_create_autocmd({
     "BufEnter",
@@ -68,6 +69,9 @@ function M.setup()
     group = group,
     callback = schedule_configuration,
   })
+
+  -- どのバッファでも使えるワークスペース共通のキー。
+  map_all()
 
   for _, buf in ipairs(vim.api.nvim_list_bufs()) do
     attach(buf)

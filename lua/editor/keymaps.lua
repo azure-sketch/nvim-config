@@ -157,6 +157,9 @@ local function file_entries(resume_input)
   -- 言語サーバー
   vim.list_extend(entries, {
     { { "n", "i" }, "<C-.>", lsp.code_action, "Show code actions" },
+    { "x", "<C-.>", lsp.code_action, "Show code actions" },
+    { "s", "<C-.>", '<C-g><Cmd>lua require("editor.file.lsp").code_action()<CR>',
+      "Show code actions" },
     { { "n", "i" }, "<C-k>", lsp.hover_prefix, "VS Code-style Ctrl+K prefix" },
     { { "n", "i" }, "<F12>", lsp.definition, "Go to definition" },
     { { "n", "i" }, "<F24>", lsp.references, "Find references" },

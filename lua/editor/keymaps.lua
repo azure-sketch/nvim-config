@@ -24,17 +24,12 @@ end
 local function area_entries(resume_input)
   local save = require("editor.area.save")
   local clipboard = require("editor.area.clipboard")
-  local find = require("editor.area.find")
-  local buffers = require("editor.area.buffers")
 
   return {
     -- 保存
     { { "n", "i", "s", "x" }, "<C-s>", function()
       save.write(resume_input)
     end, "Save file" },
-    { { "n", "i" }, "<C-S-s>", function()
-      save.save_as(resume_input)
-    end, "Save file as" },
 
     -- 元に戻す・やり直し
     { "i", "<C-z>", "<C-o>u", "Undo" },
@@ -63,6 +58,28 @@ local function area_entries(resume_input)
     -- 選択範囲を削除し、そのまま入力を続ける。
     { { "s", "x" }, "<BS>", '<C-g>"_c', "Delete selection" },
     { { "s", "x" }, "<Del>", '<C-g>"_c', "Delete selection" },
+  }
+end
+
+-- 通常ファイルだけで使うキー。
+local function file_entries(resume_input)
+  local save = require("editor.area.save")
+  local find = require("editor.area.find")
+  local area_buffers = require("editor.area.buffers")
+  local lines = require("editor.file.lines")
+  local lsp = require("editor.file.lsp")
+  local navigation = require("editor.file.navigation")
+  local buffers = require("editor.file.buffers")
+  local problems = require("editor.file.problems")
+  local format = require("editor.file.format")
+  local replace = require("editor.file.replace")
+  local selection = require("editor.file.selection")
+
+  local entries = {
+    -- 名前を付けて保存。
+    { { "n", "i" }, "<C-S-s>", function()
+      save.save_as(resume_input)
+    end, "Save file as" },
 
     -- ファイルの先頭・末尾へ移動。
     { "i", "<C-Home>", "<C-o>gg<C-o>0", "Go to file start" },
@@ -75,22 +92,8 @@ local function area_entries(resume_input)
     { { "n", "i" }, "<S-F3>", find.prev_match, "Previous match" },
 
     -- 強制破棄は行わず、既存の終了処理へ委譲する。
-    { { "n", "i" }, "<C-w>", buffers.close, "Close editor" },
+    { { "n", "i" }, "<C-w>", area_buffers.close, "Close editor" },
   }
-end
-
--- 通常ファイルだけで使うキー。
-local function file_entries(resume_input)
-  local lines = require("editor.file.lines")
-  local lsp = require("editor.file.lsp")
-  local navigation = require("editor.file.navigation")
-  local buffers = require("editor.file.buffers")
-  local problems = require("editor.file.problems")
-  local format = require("editor.file.format")
-  local replace = require("editor.file.replace")
-  local selection = require("editor.file.selection")
-
-  local entries = {}
 
   -- 行の編集
   vim.list_extend(entries, {
@@ -238,7 +241,6 @@ local function file_entries(resume_input)
     { "x", "<C-l>", selection.expand_visual_line,
       "Expand line selection", { expr = true } },
 
-    -- 未選択なら現在行をOSクリップボードへコピー・切り取りする。
     { "i", "<C-c>", '<C-o>"+yy', "Copy current line" },
     { "n", "<C-c>", '"+yy', "Copy current line" },
     { "i", "<C-x>", '<C-o>"+dd', "Cut current line" },

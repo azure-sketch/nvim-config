@@ -8,7 +8,8 @@ local decorations = {
   T = { "M", "NeoTreeGitModified" },
   D = { "D", "NeoTreeGitDeleted" },
   R = { "R", "NeoTreeGitRenamed" },
-  C = { "C", "NeoTreeGitAdded" },
+  -- Reserve C for conflicts; display Git-detected copies as additions.
+  C = { "A", "NeoTreeGitAdded" },
 }
 
 -- The name component also calls this function to obtain its Git highlight.
@@ -31,7 +32,7 @@ function M.git_status(config, node, state)
   local x, y = status:sub(1, 1), status:sub(2, 2)
   local decoration
   if require("neo-tree.git.parser").status_code_is_conflict(x, y) then
-    decoration = { "!", "NeoTreeGitConflict" }
+    decoration = { "C", "NeoTreeGitConflict" }
   else
     -- Worktree changes take precedence over index changes; never show two badges.
     local code = y ~= "" and y ~= "." and y ~= " " and y or x
@@ -48,15 +49,23 @@ function M.git_status(config, node, state)
 end
 
 -- VS Code Tokyo Night: themes/tokyo-night-color-theme.json, gitDecoration.*.
-function M.highlights(hl)
+function M.highlights(hl, colors)
+  hl.NeoTreeDirectoryName = { link = "NeoTreeFileName" }
+  hl.NeoTreeRootName = { link = "NeoTreeFileName" }
   hl.NeoTreeGitModified = { fg = "#6183bb" }
   hl.NeoTreeGitAdded = { fg = "#449dab" }
   hl.NeoTreeGitUntracked = { fg = "#449dab" }
   hl.NeoTreeGitRenamed = { fg = "#449dab" }
   hl.NeoTreeGitDeleted = { fg = "#914c54" }
   hl.NeoTreeGitIgnored = { fg = "#515670" }
-  -- The original conflict color is #e0af68cc; use opaque RGB in Neovim.
-  hl.NeoTreeGitConflict = { fg = "#e0af68" }
+  -- Composite #e0af68cc against Neo-tree's background instead of dropping alpha.
+  local background = hl.NeoTreeNormal and hl.NeoTreeNormal.bg or colors.bg_sidebar
+  if not background or background == "NONE" then
+    background = colors.bg
+  end
+  hl.NeoTreeGitConflict = {
+    fg = require("tokyonight.util").blend("#e0af68", 0xcc / 0xff, background),
+  }
 end
 
 return M

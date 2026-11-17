@@ -36,14 +36,6 @@ return {
         hijack_netrw_behavior = "open_default",
         window = {
           position = "left",
-          mappings = {
-            ["<F2>"] = "rename",
-            ["<C-c>"] = "copy_to_clipboard",
-            ["<C-x>"] = "cut_to_clipboard",
-            ["<C-v>"] = "paste_from_clipboard",
-            ["<Del>"] = "delete",
-            ["<F5>"] = "refresh",
-          },
         },
         filtered_items = {
           hide_dotfiles = false,

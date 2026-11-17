@@ -8,6 +8,13 @@ return {
     opts_extend = { "open_files_do_not_replace_types" },
 
     opts = {
+      default_component_configs = {
+        name = {
+          use_git_status_colors = true,
+          highlight_opened_files = false,
+        },
+      },
+
       window = {
         position = "left",
         width = layout.sidebar.width,
@@ -23,6 +30,9 @@ return {
       },
 
       filesystem = {
+        components = {
+          git_status = require("sidebar.neo_tree_git").git_status,
+        },
         hijack_netrw_behavior = "open_default",
         window = {
           position = "left",

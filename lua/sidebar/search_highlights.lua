@@ -12,13 +12,13 @@ function M.apply(hl)
   hl.GrugFarInputPlaceholder = { fg = muted }
   hl.GrugFarResultsHeader = { fg = muted }
   hl.GrugFarResultsStats = { fg = foreground }
-  hl.GrugFarResultsPath = { fg = foreground }
+  hl.GrugFarResultsPath = { fg = "#acb0d0" }
   hl.GrugFarResultsLineNr = { fg = muted }
   hl.GrugFarResultsCursorLineNo = { fg = foreground }
   hl.GrugFarResultsNumberLabel = { fg = muted }
   hl.GrugFarResultsMatch = { fg = "#c0caf5", bg = surface }
-  hl.GrugFarResultsMatchAdded = { fg = added }
-  hl.GrugFarResultsMatchRemoved = { fg = removed }
+  hl.GrugFarResultsMatchAdded = { bg = "#1f2c38" }
+  hl.GrugFarResultsMatchRemoved = { bg = "#34212b" }
   hl.GrugFarResultsAddIndicator = { fg = added }
   hl.GrugFarResultsRemoveIndicator = { fg = removed }
   hl.GrugFarResultsChangeIndicator = { fg = "#e0af68" }

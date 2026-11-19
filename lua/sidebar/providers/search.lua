@@ -50,6 +50,11 @@ return {
           local opts = { buffer = buf, silent = true, remap = true, desc = "Show grug-far help" }
           vim.keymap.set("i", "<F1>", "<C-o>g?", opts)
           vim.keymap.set("n", "<F1>", "g?", opts)
+
+          -- 入力中に矢印キーで結果欄へ入り込まないようにする。
+          for _, key in ipairs({ "<Up>", "<Down>" }) do
+            vim.keymap.set("i", key, "<Nop>", { buffer = buf, silent = true })
+          end
         end)
       end,
     })

@@ -1,3 +1,4 @@
+local navigation = require("sidebar.search_navigation")
 local INSTANCE = "sidebar-search"
 local FILETYPE = "grug-far"
 
@@ -6,8 +7,8 @@ return {
   key = "<C-S-f>",
   desc = "Focus search sidebar",
 
-  -- 入力できる領域。editor はこの宣言を見て入力領域と判定する。
   input = true,
+  can_resume_input = navigation.can_resume_input,
 
   match = function(buf)
     return vim.bo[buf].filetype == FILETYPE
@@ -23,14 +24,12 @@ return {
     end
   end,
 
-  -- 検索画面では、そのまま入力できる状態にする。
   on_focus = function(buf)
-    if vim.bo[buf].filetype == FILETYPE and vim.bo[buf].modifiable then
+    if vim.bo[buf].modifiable and navigation.can_resume_input(buf) then
       vim.cmd("startinsert")
     end
   end,
 
-  -- edgy.nvim 用の表示情報。
   edgy = { title = "Search", help = "F1:Help", ft = FILETYPE },
 
   setup = function()
@@ -55,6 +54,7 @@ return {
           for _, key in ipairs({ "<Up>", "<Down>" }) do
             vim.keymap.set("i", key, "<Nop>", { buffer = buf, silent = true })
           end
+          navigation.setup(buf)
         end)
       end,
     })

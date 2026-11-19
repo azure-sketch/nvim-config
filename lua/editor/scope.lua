@@ -16,7 +16,6 @@ function M.is_editable(buf)
   if not vim.api.nvim_buf_is_valid(buf) then
     return false
   end
-
   if not vim.bo[buf].modifiable then
     return false
   end
@@ -42,11 +41,15 @@ end
 
 function M.resume()
   vim.schedule(function()
-    if not M.is_editable(vim.api.nvim_get_current_buf()) then
+    local buf = vim.api.nvim_get_current_buf()
+    if not M.is_editable(buf) or vim.fn.mode() ~= "n" then
       return
     end
 
-    if vim.fn.mode() ~= "n" then
+    local views = require("sidebar.views")
+    local name = views.name_of(buf)
+    local view = name and views.get(name)
+    if view and view.can_resume_input and not view.can_resume_input(buf) then
       return
     end
 

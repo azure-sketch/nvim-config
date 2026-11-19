@@ -5,6 +5,7 @@ return {
 
     opts = {
       helpLine = { enabled = false },
+      centerOnNavigation = false,
       engines = {
         ripgrep = {
           defaults = { flags = "--fixed-strings --ignore-case" },

@@ -20,15 +20,21 @@ end
 
 function M.setup(buf)
   local function bind(modes, key, desc, action)
-    vim.keymap.set(modes, key, action, { buffer = buf, silent = true, desc = desc })
+    vim.keymap.set(modes, key, action, { buffer = buf, silent = true, nowait = true, desc = desc })
   end
 
   local function input_action(method)
     return function()
-      local _, instance = context(buf)
-      if instance and M.can_resume_input(buf) then
-        instance[method](instance)
+      local ctx, instance = context(buf)
+      if not instance or not M.can_resume_input(buf) then
+        return
       end
+      local inputs = require("grug-far.inputs")
+      -- 初期カーソルが上部の余白にいる場合も、先頭の入力欄を起点に移動する。
+      if not inputs.getInputAtRow(ctx, buf, cursor_row()) then
+        instance:goto_first_input()
+      end
+      instance[method](instance)
     end
   end
   bind({ "n", "i" }, "<Tab>", "Next search input", input_action("goto_next_input"))
@@ -41,26 +47,26 @@ function M.setup(buf)
     end
   end)
 
-  bind("n", "<C-Up>", "Return to search input from first result", function()
-    local ctx, instance = context(buf)
+  local function result_action(method)
+    return function()
+      local _, instance = context(buf)
+      if instance and not M.can_resume_input(buf) then
+        instance[method](instance, { wrap = false, includeUncounted = false })
+      end
+    end
+  end
+  bind("n", "<Up>", "Previous search match", result_action("goto_prev_match"))
+  bind("n", "<Down>", "Next search match", result_action("goto_next_match"))
+
+  bind("n", "<C-Up>", "Return to search input", function()
+    local ctx = context(buf)
     if not ctx or M.can_resume_input(buf) then
       return
     end
-
-    -- extmark は行順で返る。ファイル見出しや無効になった結果は飛ばす。
-    local marks = vim.api.nvim_buf_get_extmarks(buf, ctx.locationsNamespace, 0, -1, { details = true })
-    for _, mark in ipairs(marks) do
-      local location = ctx.state.resultLocationByExtmarkId[mark[1]]
-      if location and location.lnum and location.count and not mark[4].invalid then
-        if cursor_row() == mark[2] then
-          local _, last_row = require("grug-far.inputs").getInputPos(ctx, buf, "search")
-          if last_row then
-            vim.api.nvim_win_set_cursor(0, { last_row, 0 })
-            vim.cmd("startinsert!")
-          end
-        end
-        return
-      end
+    local _, last_row = require("grug-far.inputs").getInputPos(ctx, buf, "search")
+    if last_row then
+      vim.api.nvim_win_set_cursor(0, { last_row, 0 })
+      vim.cmd("startinsert!")
     end
   end)
 end

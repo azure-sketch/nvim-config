@@ -8,7 +8,8 @@ function M.apply(hl)
   local added = "#9ece6a"
   local removed = "#f7768e"
 
-  hl.GrugFarInputLabel = { fg = foreground }
+  -- TokyoNight の既定の blue1 より淡い cyan を使う。
+  hl.GrugFarInputLabel = { fg = "#7dcfff" }
   hl.GrugFarInputPlaceholder = { fg = muted }
   hl.GrugFarResultsHeader = { fg = muted }
   hl.GrugFarResultsStats = { fg = foreground }

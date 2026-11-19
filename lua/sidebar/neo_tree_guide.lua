@@ -4,16 +4,30 @@ local function keycode(key)
   return vim.api.nvim_replace_termcodes(key, true, true, true)
 end
 
-local function active()
-  return vim.bo.filetype == "neo-tree"
-    and vim.b.neo_tree_source == "filesystem"
-    and vim.api.nvim_get_mode().mode == "n"
+local function active(self)
+  self.guide_context = nil
+  local winid = vim.api.nvim_get_current_win()
+  local bufnr = vim.api.nvim_win_get_buf(winid)
+  if vim.bo[bufnr].filetype ~= "neo-tree"
+    or vim.b[bufnr].neo_tree_source ~= "filesystem"
+    or vim.api.nvim_get_mode().mode ~= "n"
+  then
+    return false
+  end
+
+  local state = require("neo-tree.sources.manager").get_state_for_window(winid)
+  if not state or state.disposed or state.winid ~= winid or state.bufnr ~= bufnr or not state.tree then
+    return false
+  end
+
+  self.guide_context = { state = state, winid = winid, bufnr = bufnr }
+  return true
 end
 
 -- Read labels from registered mappings, falling back to Neo-tree's own help text.
-local function entries(state)
+local function entries(state, bufnr)
   local actual = {}
-  for _, mapping in ipairs(vim.api.nvim_buf_get_keymap(0, "n")) do
+  for _, mapping in ipairs(vim.api.nvim_buf_get_keymap(bufnr, "n")) do
     actual[keycode(mapping.lhs)] = mapping
   end
 
@@ -71,13 +85,13 @@ local function label(mapping)
   return mapping and (mapping.key .. " " .. mapping.text:gsub("[\r\n]", " ")) or ""
 end
 
-local function provider()
-  local state = require("neo-tree.sources.manager").get_state_for_window()
-  if not state then
-    return ""
-  end
-  local mappings = entries(state)
-  local node = state.tree and state.tree:get_node()
+local function provider(self)
+  local context = self.guide_context
+  local state = context.state
+  local mappings = entries(state, context.bufnr)
+  -- The tree's own window handle may not be attached during a sidebar switch.
+  local lnum = vim.api.nvim_win_get_cursor(context.winid)[1]
+  local node = state.tree:get_node(lnum)
   local help = pick(mappings, { "show_help" })
   local actions = {}
   local used = {}

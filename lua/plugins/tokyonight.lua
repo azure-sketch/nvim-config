@@ -5,7 +5,10 @@ return {
     priority = 1000,
     opts = {
       style = "night",
-      on_highlights = require("sidebar.neo_tree_git").highlights,
+      on_highlights = function(hl, colors)
+        require("sidebar.neo_tree_git").highlights(hl, colors)
+        require("sidebar.search_highlights").apply(hl)
+      end,
     },
   },
 }

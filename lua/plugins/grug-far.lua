@@ -4,10 +4,18 @@ return {
     lazy = false,
 
     opts = {
+      helpLine = { enabled = false },
+      centerOnNavigation = false,
+      engines = {
+        ripgrep = {
+          defaults = { flags = "--fixed-strings --ignore-case" },
+        },
+      },
+      openTargetWindow = { preferredLocation = "right" },
       keymaps = {
-        -- 割り当てのないAlt+↑↓をInsertモードで押すと、
-        -- 既定の <up>/<down> が「前/次の結果を開く」を実行する。
-        -- この2つのキーを空にして、プラグイン側で無効にする。
+        -- 文字入力と競合しないよう、Insert / Normal で同じキーを使う。
+        replace = "<C-M-CR>",
+        -- 割り当てのないAlt+↑↓から前後の結果を開かないようにする。
         openNextLocation = { n = "" },
         openPrevLocation = { n = "" },
       },

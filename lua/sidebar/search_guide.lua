@@ -33,13 +33,15 @@ end
 local function guide_keys()
   local buf = vim.api.nvim_get_current_buf()
   local input = require("sidebar.search_navigation").can_resume_input(buf)
-  local keys = input and { "<Tab>", "<S-Tab>", "<C-Down>" } or { "<Up>", "<Down>", "<CR>", "<C-Up>" }
+  local keys = {}
   if ripgrep(buf) then
     for _, toggle in ipairs(toggles) do
       keys[#keys + 1] = toggle.key
     end
   end
+  keys[#keys + 1] = input and "<C-Down>" or "<C-Up>"
   keys[#keys + 1] = "<C-M-CR>"
+  vim.list_extend(keys, input and { "<Tab>", "<S-Tab>" } or { "<Up>", "<Down>", "<CR>" })
   return keys
 end
 

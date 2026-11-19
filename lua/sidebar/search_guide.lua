@@ -45,20 +45,13 @@ local function guide_keys()
   return keys
 end
 
-local key_labels = {
-  ["<S-Tab>"] = "Shift+Tab", ["<C-Down>"] = "Ctrl+↓", ["<C-Up>"] = "Ctrl+↑",
-  ["<Up>"] = "↑", ["<Down>"] = "↓", ["<CR>"] = "Enter", ["<C-M-CR>"] = "Ctrl+Alt+Enter",
-}
-
 local function entry(key, mode)
   local map = vim.fn.maparg(key, mode, false, true)
-  if map.buffer ~= 1 or not map.desc then
+  if map.buffer ~= 1 or type(map.desc) ~= "string" or map.desc == "" then
     return
   end
-  local label = key_labels[key] or key:gsub("^<M%-(%a)>$", function(letter)
-    return "Alt+" .. letter:upper()
-  end):gsub("[<>]", "")
-  return label .. ": " .. map.desc
+  local code = vim.api.nvim_replace_termcodes(map.lhs, true, true, true)
+  return vim.fn.keytrans(code) .. " " .. map.desc:gsub("[\r\n]", " ")
 end
 
 function M.wrap(statusline)

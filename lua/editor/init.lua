@@ -72,6 +72,7 @@ function M.setup()
   require("editor.global.trim").setup()
   require("editor.global.autosave").setup()
   require("editor.global.initial_buffer").setup()
+  require("editor.global.dashboard").setup()
 
   local group = vim.api.nvim_create_augroup(
     "Editor",

@@ -7,6 +7,11 @@ return {
 
   opts = {
     styles = {
+      -- 起動画面は、バッファが開くまで q で閉じさせない。
+      dashboard = {
+        keys = { q = false },
+      },
+
       input = {
         keys = {
           i_esc = { "<Esc>", "cancel", mode = "i", expr = false },

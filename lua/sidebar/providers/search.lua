@@ -33,6 +33,8 @@ return {
   edgy = { title = "Search", help = "F1:Help", ft = FILETYPE },
 
   setup = function()
+    require("sidebar.search_target").setup()
+
     vim.api.nvim_create_autocmd("FileType", {
       group = vim.api.nvim_create_augroup("SidebarSearchBuffer", { clear = true }),
       pattern = FILETYPE,

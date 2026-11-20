@@ -15,18 +15,12 @@ return {
   end,
 
   open = function()
-    local grug = require("grug-far")
-
-    if grug.has_instance(INSTANCE) then
-      grug.get_instance(INSTANCE):open()
-    else
-      grug.open({ instanceName = INSTANCE, staticTitle = "Search" })
-    end
+    require("sidebar.search_target").open({ instanceName = INSTANCE, staticTitle = "Search" })
   end,
 
   on_focus = function(buf)
-    if vim.bo[buf].modifiable and navigation.can_resume_input(buf) then
-      vim.cmd("startinsert")
+    if vim.bo[buf].modifiable then
+      navigation.focus_input(buf)
     end
   end,
 

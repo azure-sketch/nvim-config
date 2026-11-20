@@ -19,31 +19,13 @@ local function provider(name)
   return spec
 end
 
-local function is_sidebar(buf)
-  return views.name_of(buf) ~= nil
-end
-
 local function goto_editor()
   require("edgy").goto_main()
-
-  local current = vim.api.nvim_get_current_win()
-
-  if not is_sidebar(vim.api.nvim_win_get_buf(current)) then
-    return current
+  local win = require("sidebar.search_target").editor()
+  if win then
+    vim.api.nvim_set_current_win(win)
+    return win
   end
-
-  for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
-    local b = vim.api.nvim_win_get_buf(win)
-
-    if vim.api.nvim_win_get_config(win).relative == ""
-        and vim.bo[b].buftype == ""
-        and not is_sidebar(b)
-    then
-      vim.api.nvim_set_current_win(win)
-      return win
-    end
-  end
-
   error("サイドバー以外の編集ウィンドウが見つかりません")
 end
 

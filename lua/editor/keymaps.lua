@@ -312,6 +312,12 @@ function M.apply_global(quick_open)
   keymap.set({ "n", "i", "s", "x" }, "<C-S-p>", "<Esc>:", {
     desc = "Command line",
   })
+
+  -- プロジェクト内のTODOマーカー一覧(Snacks picker)。
+  -- Ctrl+Shift+TはWindowsターミナルの新規タブと衝突するためAlt+Tを使う。
+  keymap.set({ "n", "i", "s", "x" }, "<A-t>", function()
+    require("snacks").picker.todo_comments()
+  end, { desc = "Show TODO comments" })
 end
 
 -- ワークスペース共通のキー（lua/bindings.lua）を編集バッファにも割り当てる。
